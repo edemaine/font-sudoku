@@ -1,7 +1,7 @@
 ## Examples from
 ## https://py.mit.edu/_static/fall19/lectures/lecture04/lecture4.zip
 
-{Sudoku} = require './sudoku.coffee'
+{Sudoku} = require './sudoku'
 
 easy = [[5,1,7,6,0,0,0,3,4]
         [2,8,9,0,0,4,0,0,0]
@@ -47,14 +47,12 @@ all = true
 
 for input in [easy, medium, hard, diff]
   sudoku = new Sudoku input
-  console.log sudoku.toString()
+  console.log "#{sudoku}"
   console.log 'solves to:'
   if all
     for solution from sudoku.solutions()
-      console.log ''
-      console.log solution.toString()
+      console.log "\n#{solution}"
   else
     sudoku.solve()
-    console.log ''
-    console.log sudoku.toString()
+    console.log "\n#{sudoku}"
   console.log '-------------------------------'
