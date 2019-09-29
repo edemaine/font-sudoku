@@ -3,7 +3,12 @@ subSize = 3
 
 class Sudoku
   constructor: (cells) ->
-    @cell = cells or
+    if cells
+      @cell = cells
+      console.assert @cell.length == boardSize, "#{boardSize} rows"
+      for row in @cell
+        console.assert row.length == boardSize, "Row #{row} has #{boardSize} columns"
+    else
       for i in [0...boardSize]
         for j in [0...boardSize]
           null
@@ -116,17 +121,28 @@ class Sudoku
     for [i, j] in implied
       @cell[i][j] = 0
 
-  firstEmptyCell: ->
+  cellsSatisfying: (condition) ->
     for i in [0...boardSize]
       for j in [0...boardSize]
-        if @cell[i][j] == 0
-          return [i, j]
+        if condition @cell[i][j]
+          yield [i, j]
+
+  filledCells: ->
+    @cellsSatisfying (v) -> v != 0
+
+  firstCellSatisfying: (condition) ->
+    for cell from @cellsSatisfying condition
+      return cell
     null
+
+  firstEmptyCell: ->
+    @firstCellSatisfying (v) -> v == 0
 
   solutions: () ->
     ###
     Generator for all solutions to a puzzle, yielding itself as it modifies
-    into each solution.  Clone each result to store all solutions.
+    into each solution.
+    Clone each result or use `allSolutions` to store all solutions.
     ###
     implied = @fillImplied()
     cell = @firstEmptyCell()
@@ -146,10 +162,63 @@ class Sudoku
   solve: ->
     ###
     Modify puzzle into a solution and return it, or null upon failure.
-    Use clone() first if you want a copy instead of a in-place modification.
+    Use clone() first if you want a copy instead of in-place modification.
     ###
     for solution from @solutions()
       return solution
     null
+
+  allSolutions: ->
+    ###
+    Return list of all solutions to the puzzle, as separate clones,
+    leaving the puzzle intact.
+    ###
+    for solution from @solutions()
+      solution.clone()
+
+  uniqueSolution: ->
+    ###
+    Does this puzzle have a unique solution, i.e., exactly one solutions?
+    ###
+    ## Less efficient test:
+    #@allSolutions().length == 1
+    solutions = @clone().solutions()
+    one = solutions.next()
+    return false if one.done
+    two = solutions.next()
+    return false unless two.done
+    true
+
+  reduceImplied: ->
+    loop
+      cells = Array.from @filledCells()
+      while cells.length
+        index = Math.floor Math.random() * cells.length
+        [i,j] = cells[index]
+        old = @cell[i][j]
+        @cell[i][j] = 0
+        (refilled = @clone()).fillImplied()
+        break if refilled.cell[i][j] == old
+        @cell[i][j] = old
+        last = cells.pop()
+        cells[index] = last if cells.length
+      break unless cells.length
+    @
+
+  reduceUnique: ->
+    console.assert @uniqueSolution(), "Puzzle should have unique solution"
+    loop
+      cells = Array.from @filledCells()
+      while cells.length
+        index = Math.floor Math.random() * cells.length
+        [i,j] = cells[index]
+        old = @cell[i][j]
+        @cell[i][j] = 0
+        break if @uniqueSolution()
+        @cell[i][j] = old
+        last = cells.pop()
+        cells[index] = last if cells.length
+      break unless cells.length
+    @
 
 module.exports = {Sudoku}
