@@ -130,6 +130,15 @@ class Sudoku
   filledCells: ->
     @cellsSatisfying (v) -> v != 0
 
+  countCellsSatisfying: (condition) ->
+    count = 0
+    for cell from @cellsSatisfying condition
+      count++
+    count
+
+  countFilledCells: ->
+    @countCellsSatisfying (v) -> v != 0
+
   firstCellSatisfying: (condition) ->
     for cell from @cellsSatisfying condition
       return cell

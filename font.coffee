@@ -21,9 +21,12 @@ for letter, puzzle of font
   #console.log "Considering first solution:" if solutions.length > 1
   #solution = solutions[0]
   solution = sudoku.clone().solve()
+  console.log "SOLUTION:"
   console.log "\n#{solution}"
   console.log "REDUCED BY IMPLICATION:"
-  console.log "\n#{solution.clone().reduceImplied()}"
+  console.log "\n#{i = solution.clone().reduceImplied()}"
+  console.log "(#{i.countFilledCells()} filled cells)\n"
   console.log "REDUCED BY UNIQUENESS:"
   console.log "\n#{u = solution.clone().reduceUnique()}"
+  console.log "(#{u.countFilledCells()} filled cells)\n"
   #console.log "... #{u.allSolutions().length} solutions"
