@@ -43,11 +43,18 @@ diff  = [[0,0,5,3,0,0,0,0,0]
          [0,0,4,0,0,0,0,3,0]
          [0,0,0,0,0,9,7,0,0]]
 
+all = true
+
 for input in [easy, medium, hard, diff]
   sudoku = new Sudoku input
   console.log sudoku.toString()
-  sudoku.solve()
   console.log 'solves to:'
-  console.log ''
-  console.log sudoku.toString()
+  if all
+    for solution from sudoku.solutions()
+      console.log ''
+      console.log solution.toString()
+  else
+    sudoku.solve()
+    console.log ''
+    console.log sudoku.toString()
   console.log '-------------------------------'

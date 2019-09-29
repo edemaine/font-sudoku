@@ -123,20 +123,33 @@ class Sudoku
           return [i, j]
     null
 
-  solve: ->
+  solutions: () ->
+    ###
+    Generator for all solutions to a puzzle, yielding itself as it modifies
+    into each solution.  Clone each result to store all solutions.
+    ###
     implied = @fillImplied()
     cell = @firstEmptyCell()
-    # Check for filled in puzzle
+    # Check for filled-in puzzle
     unless cell?
-      return @
+      yield @
+      return
     [i, j] = cell
     for v in [1..9]
       if @validSetting i, j, v
         @cell[i][j] = v
-        if @solve()
-          return @
+        yield from @solutions()
         @cell[i][j] = 0
     @undoImplied implied
+    return
+
+  solve: ->
+    ###
+    Modify puzzle into a solution and return it, or null upon failure.
+    Use clone() first if you want a copy instead of a in-place modification.
+    ###
+    for solution from @solutions()
+      return solution
     null
 
 module.exports = {Sudoku}
