@@ -43,8 +43,8 @@ class Sudoku
       if @cell[ii][j] == v
         return false
     # 3x3 subgrid constraint
-    sub_i = (i // 3) * 3
-    sub_j = (j // 3) * 3
+    sub_i = (i // subSize) * subSize
+    sub_j = (j // subSize) * subSize
     for ii in [sub_i ... sub_i+subSize]
       for jj in [sub_j ... sub_j+subSize]
         if @cell[ii][jj] == v
@@ -97,8 +97,8 @@ class Sudoku
           for ii in [0...boardSize]
             used[@cell[ii][j]] = true
           # 3x3 subgrid constraint
-          sub_i = (i // 3) * 3
-          sub_j = (j // 3) * 3
+          sub_i = (i // subSize) * subSize
+          sub_j = (j // subSize) * subSize
           for ii in [sub_i ... sub_i + subSize]
             for jj in [sub_j ... sub_j + subSize]
               used[@cell[ii][jj]] = true
@@ -111,7 +111,7 @@ class Sudoku
                 break
               unused = v
           if unused?
-            #if validSetting grid, i, j, unused
+            #if @validSetting i, j, unused
             @cell[i][j] = unused
             implied.push [i, j]
             anotherRound = true
@@ -149,13 +149,13 @@ class Sudoku
     # Check for filled-in puzzle
     unless cell?
       yield @
-      return
-    [i, j] = cell
-    for v in [1..9]
-      if @validSetting i, j, v
-        @cell[i][j] = v
-        yield from @solutions()
-        @cell[i][j] = 0
+    else
+      [i, j] = cell
+      for v in [1..9]
+        if @validSetting i, j, v
+          @cell[i][j] = v
+          yield from @solutions()
+          @cell[i][j] = 0
     @undoImplied implied
     return
 
