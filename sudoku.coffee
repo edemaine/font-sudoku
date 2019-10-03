@@ -16,6 +16,9 @@ class Sudoku
         console.assert row.length == @boardSize, "Row #{row} has #{@boardSize} columns"
       @subSize = Math.floor Math.sqrt @cell.length
       console.assert @subSize * @subSize == @boardSize
+    # This flag controls whether to randomize the choices made by the solver.
+    # Set to false for lexically ordered solutions.
+    @randomize = true
 
   toString: ->
     s = ''
@@ -151,7 +154,15 @@ class Sudoku
   firstEmptyCell: ->
     @firstCellSatisfying (v) -> v == 0
 
-  solutions: () ->
+  cellOptions: ->
+    options = [1..@boardSize]
+    if @randomize  # random permutation
+      for k in [0...options.length-1]
+        r = k + Math.floor (options.length-k) * Math.random()
+        [options[k], options[r]] = [options[r], options[k]]
+    options
+
+  solutions: ->
     ###
     Generator for all solutions to a puzzle, yielding itself as it modifies
     into each solution.
@@ -164,7 +175,7 @@ class Sudoku
       yield @
     else
       [i, j] = cell
-      for v in [1..9]
+      for v in @cellOptions()
         if @validSetting i, j, v
           @cell[i][j] = v
           yield from @solutions()
