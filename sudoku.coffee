@@ -1,3 +1,7 @@
+# These widths must match the widths in design.html
+minorWidth = 0.05
+majorWidth = 0.15
+
 class Sudoku
   constructor: (cells) ->
     # Pass in subSize (e.g. 3 for standard Sudoku) or an array of arrays
@@ -247,3 +251,116 @@ class Sudoku
 
 exports = {Sudoku}
 (window ? module.exports)[key] = value for key, value of exports
+
+## GENERIC GUI
+
+# Use CSS to specify fonts
+SVG?.defaults.attrs['font-family'] = null
+SVG?.defaults.attrs['font-size'] = null
+
+class SudokuGUI
+  constructor: (@sudoku, @svg) ->
+    @edgesGroup = @svg.group()
+    .addClass 'edges'
+    @gridGroup = @svg.group()
+    .addClass 'grid'
+    @numbersGroup = @svg.group()
+    .addClass 'numbers'
+    @drawGrid()
+    @drawNumbers()
+
+  drawGrid: ->
+    @gridGroup.clear()
+    for i in [0..@sudoku.boardSize]
+      l1 = @gridGroup.line 0, i, @sudoku.boardSize, i
+      l2 = @gridGroup.line i, 0, i, @sudoku.boardSize
+      if i % @sudoku.subSize == 0
+        l1.addClass 'major'
+        l2.addClass 'major'
+    @svg.viewbox
+      x: -majorWidth/2
+      y: -majorWidth/2
+      width: @sudoku.boardSize + majorWidth
+      height: @sudoku.boardSize + majorWidth
+
+  drawNumbers: ->
+    @edgesGroup.clear()
+    @numbersGroup.clear()
+    for i in [0...@sudoku.boardSize]
+      for j in [0...@sudoku.boardSize]
+        number = @sudoku.cell[i][j]
+        continue unless number
+        @numbersGroup.text "#{number}"
+        .move j+0.5, i-0.05
+        if i > 0 and @sudoku.cell[i-1][j] and
+           1 == Math.abs number - @sudoku.cell[i-1][j]
+          @edgesGroup.line j+0.5, i+0.5, j+0.5, i-0.5
+        if j > 0 and @sudoku.cell[i][j-1] and
+           1 == Math.abs number - @sudoku.cell[i][j-1]
+          @edgesGroup.line j+0.5, i+0.5, j-0.5, i+0.5
+
+## Based on meouw's answer on http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
+getOffset = (el) ->
+  x = y = 0
+  while el and not isNaN(el.offsetLeft) and not isNaN(el.offsetTop)
+    x += el.offsetLeft - el.scrollLeft
+    y += el.offsetTop - el.scrollTop
+    el = el.offsetParent
+  x: x
+  y: y
+
+resize = (id) ->
+  offset = getOffset document.getElementById id
+  height = Math.max 100, window.innerHeight - offset.y
+  document.getElementById(id).style.height = "#{height}px"
+
+## DESIGNER GUI
+
+designUpdate = ->
+
+designGui = ->
+  designSVG = SVG 'design'
+  resultSVG = SVG 'result'
+  #sudoku = new Sudoku 3
+  sudoku = new Sudoku font.A
+  sudoku.solve()
+  gui = new SudokuGUI sudoku, designSVG
+
+  furls = new Furls()
+  .addInputs()
+  .on 'stateChange', designUpdate
+  .syncState()
+
+###
+  document.getElementById 'clear'
+  .addEventListener 'click', -> designer.clear()
+  document.getElementById('downloadSVG')?.addEventListener 'click', ->
+    explicit = svgExplicit svg
+    document.getElementById('svglink').href = URL.createObjectURL \
+      new Blob [explicit], type: "image/svg+xml"
+    document.getElementById('svglink').download = 'chiaroscuro.svg'
+    document.getElementById('svglink').click()
+
+  for event in ['input', 'change']
+    do (event) ->
+      for checkbox in checkboxes
+        document.getElementById(checkbox).addEventListener event,
+          -> designer.setState event == 'change'
+      for range in ranges
+        document.getElementById(range).addEventListener event, ->
+          designer.setState event == 'change'
+          designer.patternChange()
+###
+
+  window.addEventListener 'resize', -> resize 'gui'
+  resize 'gui'
+
+## GUI MAIN
+
+window?.onload = ->
+  #if window.showMe?
+  #  showMe()
+  if document.getElementById 'text'
+    fontGui()
+  else if document.getElementById 'design'
+    designGui()
