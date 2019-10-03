@@ -1,30 +1,32 @@
-boardSize = 9
-subSize = 3
-
 class Sudoku
   constructor: (cells) ->
-    if cells
-      @cell = cells
-      console.assert @cell.length == boardSize, "#{boardSize} rows"
-      for row in @cell
-        console.assert row.length == boardSize, "Row #{row} has #{boardSize} columns"
-    else
+    # Pass in subSize (e.g. 3 for standard Sudoku) or an array of arrays
+    # representing the grid, where 0 means a blank cell.
+    if typeof cells == 'number'
+      @subSize = Math.floor cells
+      @boardSize = @subSize * @subSize
       @cell =
-        for i in [0...boardSize]
-          for j in [0...boardSize]
-            null
-    console.assert subSize * subSize == boardSize
+        for i in [0...@boardSize]
+          for j in [0...@boardSize]
+            0
+    else
+      @cell = cells
+      @boardSize = @cell.length
+      for row in @cell
+        console.assert row.length == @boardSize, "Row #{row} has #{@boardSize} columns"
+      @subSize = Math.floor Math.sqrt @cell.length
+      console.assert @subSize * @subSize == @boardSize
 
   toString: ->
     s = ''
-    for i in [0...boardSize]
-      for j in [0...boardSize]
-        s += '[' if j % subSize == 0
+    for i in [0...@boardSize]
+      for j in [0...@boardSize]
+        s += '[' if j % @subSize == 0
         s += @cell[i][j]
-        s += ']' if j % subSize == subSize-1
+        s += ']' if j % @subSize == @subSize-1
         s += ' '
       s += '\n'
-      s += '\n' if i % subSize == subSize-1 unless i == boardSize-1
+      s += '\n' if i % @subSize == @subSize-1 unless i == @boardSize-1
     s
 
   clone: ->
@@ -37,18 +39,18 @@ class Sudoku
     ## Would setting [i,j] to v not violate any Sudoku constraints?
     ## Existing setting for [i,j] should be null, to avoid false detection.
     # row constraint
-    for jj in [0...boardSize]
+    for jj in [0...@boardSize]
       if @cell[i][jj] == v
         return false
     # column constraint
-    for ii in [0...boardSize]
+    for ii in [0...@boardSize]
       if @cell[ii][j] == v
         return false
     # 3x3 subgrid constraint
-    sub_i = (i // subSize) * subSize
-    sub_j = (j // subSize) * subSize
-    for ii in [sub_i ... sub_i+subSize]
-      for jj in [sub_j ... sub_j+subSize]
+    sub_i = (i // @subSize) * @subSize
+    sub_j = (j // @subSize) * @subSize
+    for ii in [sub_i ... sub_i+@subSize]
+      for jj in [sub_j ... sub_j+@subSize]
         if @cell[ii][jj] == v
           return false
     true
@@ -56,26 +58,26 @@ class Sudoku
   validBoard: ->
     ## Does the entire board satisfy all Sudoku no-duplication constraints?
     # row constraint
-    for i in [0...boardSize]
+    for i in [0...@boardSize]
       seen = {}
       for v in @cell[i]
         if seen[v]
           return false
         seen[v] = true
     # column constraint
-    for j in [0...boardSize]
+    for j in [0...@boardSize]
       seen = {}
-      for i in [0...boardSize]
+      for i in [0...@boardSize]
         v = @cell[i][j]
         if seen[v]
           return false
         seen[v] = true
     # 3x3 subgrid constraint
-    for sub_i in [0 ... boardSize // subSize]
-      for sub_j in [0 ... boardSize // subSize]
+    for sub_i in [0 ... @boardSize // @subSize]
+      for sub_j in [0 ... @boardSize // @subSize]
         seen = {}
-        for i in [sub_i ... sub_i + subSize]
-          for j in [sub_j ... sub_j + subSize]
+        for i in [sub_i ... sub_i + @subSize]
+          for j in [sub_j ... sub_j + @subSize]
             v = @cell[i][j]
             if seen[v]
               return false
@@ -87,22 +89,22 @@ class Sudoku
     anotherRound = true
     while anotherRound
       anotherRound = false
-      for i in [0...boardSize]
-        for j in [0...boardSize]
+      for i in [0...@boardSize]
+        for j in [0...@boardSize]
           # Consider all blank cells
           continue unless @cell[i][j] == 0
           used = {}
           # row constraint
-          for jj in [0...boardSize]
+          for jj in [0...@boardSize]
             used[@cell[i][jj]] = true
           # column constraint
-          for ii in [0...boardSize]
+          for ii in [0...@boardSize]
             used[@cell[ii][j]] = true
           # 3x3 subgrid constraint
-          sub_i = (i // subSize) * subSize
-          sub_j = (j // subSize) * subSize
-          for ii in [sub_i ... sub_i + subSize]
-            for jj in [sub_j ... sub_j + subSize]
+          sub_i = (i // @subSize) * @subSize
+          sub_j = (j // @subSize) * @subSize
+          for ii in [sub_i ... sub_i + @subSize]
+            for jj in [sub_j ... sub_j + @subSize]
               used[@cell[ii][jj]] = true
           # check for unique unused value
           unused = null
@@ -124,8 +126,8 @@ class Sudoku
       @cell[i][j] = 0
 
   cellsSatisfying: (condition) ->
-    for i in [0...boardSize]
-      for j in [0...boardSize]
+    for i in [0...@boardSize]
+      for j in [0...@boardSize]
         if condition @cell[i][j]
           yield [i, j]
 
