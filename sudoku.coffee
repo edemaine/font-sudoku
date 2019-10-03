@@ -9,9 +9,11 @@ class Sudoku
       for row in @cell
         console.assert row.length == boardSize, "Row #{row} has #{boardSize} columns"
     else
-      for i in [0...boardSize]
-        for j in [0...boardSize]
-          null
+      @cell =
+        for i in [0...boardSize]
+          for j in [0...boardSize]
+            null
+    console.assert subSize * subSize == boardSize
 
   toString: ->
     s = ''
@@ -230,4 +232,5 @@ class Sudoku
       break unless cells.length
     @
 
-module.exports = {Sudoku}
+exports = {Sudoku}
+(window ? module.exports)[key] = value for key, value of exports
