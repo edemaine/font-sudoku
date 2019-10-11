@@ -291,7 +291,7 @@ class SudokuGUI
         number = @sudoku.cell[i][j]
         continue unless number
         @numbersGroup.text "#{number}"
-        .move j+0.5, i-0.05
+        .move j+0.5, i+0.15
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
           @edgesGroup.line j+0.5, i+0.5, j+0.5, i-0.5
