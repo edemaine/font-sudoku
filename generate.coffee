@@ -1,10 +1,8 @@
 {Sudoku} = require './sudoku'
 {font} = require './font'
 
-for letter, array of font
-  continue if letter in ['D', 'M', 'N', 'Q', 'W']
-  console.log "#{letter}"
-  sudoku = new Sudoku array
+generate = (letter) ->
+  sudoku = new Sudoku font[letter]
   bad = true
   while bad
     solution = sudoku.clone().solve()
@@ -17,5 +15,15 @@ for letter, array of font
             break
       break if bad
     unless bad
+      console.log JSON.stringify solution.cell
       console.log "#{solution}"
       break
+
+if module? and module == require?.main
+  loop
+    for letter of font
+      if process.argv.length > 2
+        continue unless letter in process.argv
+      #continue if letter in ['D', 'M', 'N', 'Q', 'W']
+      console.log "# #{letter}"
+      generate letter
