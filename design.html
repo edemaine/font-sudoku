@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <HTML xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
       xmlns:svg="http://www.w3.org/2000/svg"
-      xmlns:v="urn:schemas-microsoft-com:vml"
       xmlns:xlink="http://www.w3.org/1999/xlink">
   <HEAD>
     <TITLE>Sudoku Designer</TITLE>
@@ -15,7 +14,6 @@
       @media print {
         .noprint { display: none; }
       }
-      .center { text-align: center; }
       TEXTAREA { vertical-align: middle; }
 
       /* NYTimes uses #959595 for inner lines, nyt-franklin for font */
@@ -42,28 +40,29 @@
           <H2>by <A HREF="http://erikdemaine.org/">Erik&nbsp;Demaine</A> and <A HREF="http://martindemaine.org">Martin&nbsp;Demaine</A>, 2019</H2>
     </TABLE>
 
-    <P ID="warnings">
-    </P>
-
     <TABLE WIDTH="100%" CLASS="noprint">
-      <TD CLASS="center">
-        <SELECT ID="board">
-          <OPTION VALUE="4">4&nbsp;&times;&nbsp;4</OPTION>
-          <OPTION VALUE="9" SELECTED>9&nbsp;&times;&nbsp;9</OPTION>
-          <OPTION VALUE="16">16&nbsp;&times;&nbsp;16</OPTION>
-          <OPTION VALUE="25">25&nbsp;&times;&nbsp;25</OPTION>
-        </SELECT>
-        <BR>
-        <DIV CLASS="setting noprint">
-          <BUTTON ID="clear">Clear</BUTTON>
-        </DIV>
-      <TD>
-        <INPUT TYPE="checkbox" CHECKED ID="edges"> <LABEL FOR="edges">Consecutive edges</LABEL>
-        <BR>
-        <INPUT TYPE="checkbox" CHECKED ID="path"> <LABEL FOR="path">Longest path</LABEL>
-      <TD>
-        <BUTTON ID="downloadSVG">Download SVG</BUTTON>
-        <A style="display: none" id="svglink"></A>
+      <TR>
+        <TD CLASS="center">
+          <SELECT ID="board">
+            <OPTION VALUE="4">4&nbsp;&times;&nbsp;4</OPTION>
+            <OPTION VALUE="9" SELECTED>9&nbsp;&times;&nbsp;9</OPTION>
+            <OPTION VALUE="16">16&nbsp;&times;&nbsp;16</OPTION>
+            <OPTION VALUE="25">25&nbsp;&times;&nbsp;25</OPTION>
+          </SELECT>
+          <BR>
+          <DIV CLASS="setting noprint">
+            <BUTTON ID="clear">Clear</BUTTON>
+          </DIV>
+        </TD>
+        <TD>
+          <INPUT TYPE="checkbox" CHECKED ID="edges"> <LABEL FOR="edges">Consecutive edges</LABEL>
+          <BR>
+          <INPUT TYPE="checkbox" CHECKED ID="path"> <LABEL FOR="path">Longest path</LABEL>
+        </TD>
+        <TD>
+          <BUTTON ID="downloadSVG">Download SVG</BUTTON>
+          <A style="display: none" id="svglink"></A>
+        </TD>
     </TABLE>
 
     <P>

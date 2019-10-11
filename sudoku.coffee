@@ -259,7 +259,7 @@ SVG?.defaults.attrs['font-family'] = null
 SVG?.defaults.attrs['font-size'] = null
 
 class SudokuGUI
-  constructor: (@sudoku, @svg) ->
+  constructor: (@svg, @sudoku) ->
     @edgesGroup = @svg.group()
     .addClass 'edges'
     @gridGroup = @svg.group()
@@ -334,7 +334,7 @@ designGui = ->
   #sudoku = new Sudoku 3
   sudoku = new Sudoku font.A
   sudoku.solve()
-  gui = new SudokuGUI sudoku, designSVG
+  gui = new SudokuGUI designSVG, sudoku
 
   furls = new Furls()
   .addInputs()
@@ -364,6 +364,62 @@ designGui = ->
 
   window.addEventListener 'resize', -> resize 'gui'
   resize 'gui'
+
+## FONT GUI
+
+updateText = (changed) ->
+  state = @getState()
+  Box = SudokuGUI
+
+  charBoxes = {}
+  output = document.getElementById 'output'
+  output.innerHTML = '' ## clear previous children
+  for line in state.text.split '\n'
+    output.appendChild outputLine = document.createElement 'p'
+    outputLine.setAttribute 'class', 'line'
+    outputLine.appendChild outputWord = document.createElement 'span'
+    outputWord.setAttribute 'class', 'word'
+    for char, c in line
+      char = char.toUpperCase()
+      if char of window.font
+        letter = window.font[char]
+        svg = SVG outputWord
+        box = new Box svg, new Sudoku letter
+        charBoxes[char] ?= []
+        charBoxes[char].push box
+        box.linked = charBoxes[char]
+      else if char == ' '
+        #space = document.createElement 'span'
+        #space.setAttribute 'class', 'space'
+        #outputLine.appendChild space
+        outputLine.appendChild outputWord = document.createElement 'span'
+        outputWord.setAttribute 'class', 'word'
+      else
+        console.log "Unknown character '#{char}'"
+
+sizeUpdate = ->
+  size = document.getElementById('size').value
+  while document.getElementById('svgSize').sheet.cssRules.length > 0
+    document.getElementById('svgSize').sheet.deleteRule 0
+  document.getElementById('svgSize').sheet.insertRule(
+    "svg { width: #{0.9*size}px; margin: #{size*0.05}px; }", 0)
+  document.getElementById('svgSize').sheet.insertRule(
+    ".word + .word { margin-left: #{0.4*size}px; }", 1)
+
+fontGui = ->
+  furls = new Furls()
+  .addInputs()
+  .on 'stateChange', updateText
+  .syncState()
+
+  window.addEventListener 'resize', ->
+    resize 'output'
+    document.getElementById('size').max =
+      document.getElementById('size').scrollWidth - 30 - 2
+  resize 'output'
+  for event in ['input', 'propertychange']
+    document.getElementById('size').addEventListener event, sizeUpdate
+  sizeUpdate()
 
 ## GUI MAIN
 
