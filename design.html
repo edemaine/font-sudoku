@@ -18,9 +18,12 @@
       .center { text-align: center; }
       TEXTAREA { vertical-align: middle; }
 
+      /* NYTimes uses #959595 for inner lines, nyt-franklin for font */
+
       /* These widths must match minorWidth and majorWidth in sudoku.coffee */
-      svg .grid line { stroke-width: 0.05; stroke: black; stroke-linecap: square; }
+      svg .grid line { stroke-width: 0.05; stroke: #666; stroke-linecap: square; }
       svg .grid line.major { stroke-width: 0.15; }
+      svg .grid line.border { stroke-width: 0.15; stroke: black; }
 
       svg .numbers text { text-anchor: middle; font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 0.6px; }
       svg .edges line { stroke-width: 0.5; stroke: #cac; stroke-linecap: round; }

@@ -271,12 +271,15 @@ class SudokuGUI
 
   drawGrid: ->
     @gridGroup.clear()
-    for i in [0..@sudoku.boardSize]
+    for i in [1..@sudoku.boardSize].concat [0] # put border at end/top
       l1 = @gridGroup.line 0, i, @sudoku.boardSize, i
       l2 = @gridGroup.line i, 0, i, @sudoku.boardSize
       if i % @sudoku.subSize == 0
         l1.addClass 'major'
         l2.addClass 'major'
+      if i % @sudoku.boardSize == 0
+        l1.addClass 'border'
+        l2.addClass 'border'
     @svg.viewbox
       x: -majorWidth/2
       y: -majorWidth/2
