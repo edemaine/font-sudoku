@@ -269,22 +269,27 @@ class SudokuGUI
     @drawGrid()
     @drawNumbers()
 
+  coord: (i, line = false) ->
+    ci = i + i // @sudoku.subSize * (majorWidth - minorWidth)
+    if line and i % @sudoku.subSize == 0
+      ci -= 0.5 * (majorWidth - minorWidth)
+    ci
+
   drawGrid: ->
     @gridGroup.clear()
     for i in [1..@sudoku.boardSize].concat [0] # put border at end/top
-      l1 = @gridGroup.line 0, i, @sudoku.boardSize, i
-      l2 = @gridGroup.line i, 0, i, @sudoku.boardSize
-      if i % @sudoku.subSize == 0
-        l1.addClass 'major'
-        l2.addClass 'major'
-      if i % @sudoku.boardSize == 0
-        l1.addClass 'border'
-        l2.addClass 'border'
+      for coords in [[0, i, @sudoku.boardSize, i]
+                     [i, 0, i, @sudoku.boardSize]]
+        l = @gridGroup.line (@coord(x, true) for x in coords)
+        if i % @sudoku.subSize == 0
+          l.addClass 'major'
+        if i % @sudoku.boardSize == 0
+          l.addClass 'border'
     @svg.viewbox
-      x: -majorWidth/2
-      y: -majorWidth/2
-      width: @sudoku.boardSize + majorWidth
-      height: @sudoku.boardSize + majorWidth
+      x: @coord(0, true) - majorWidth/2
+      y: @coord(0, true) - majorWidth/2
+      width: @coord(@sudoku.boardSize, true) - @coord(0, true) + majorWidth
+      height: @coord(@sudoku.boardSize, true) - @coord(0, true) + majorWidth
 
   drawNumbers: ->
     @edgesGroup.clear()
@@ -293,14 +298,16 @@ class SudokuGUI
       for j in [0...@sudoku.boardSize]
         number = @sudoku.cell[i][j]
         continue unless number
+        ci = @coord i
+        cj = @coord j
         @numbersGroup.text "#{number}"
-        .move j+0.5, i+0.15
+        .move cj+0.5, ci+0.15
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
-          @edgesGroup.line j+0.5, i+0.5, j+0.5, i-0.5
+          @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
         if j > 0 and @sudoku.cell[i][j-1] and
            1 == Math.abs number - @sudoku.cell[i][j-1]
-          @edgesGroup.line j+0.5, i+0.5, j-0.5, i+0.5
+          @edgesGroup.line cj+0.5, ci+0.5, cj-0.5, ci+0.5
 
 ## Based on meouw's answer on http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
 getOffset = (el) ->
