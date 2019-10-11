@@ -102,34 +102,36 @@ class Sudoku
           break if dead
           for j in [0...@boardSize]
             # Consider all blank cells
-            continue unless @cell[i][j] == 0
-            used = {}
-            # row constraint
-            for jj in [0...@boardSize]
-              used[@cell[i][jj]] = true
-            # column constraint
-            for ii in [0...@boardSize]
-              used[@cell[ii][j]] = true
-            # 3x3 subgrid constraint
-            sub_i = (i // @subSize) * @subSize
-            sub_j = (j // @subSize) * @subSize
-            for ii in [sub_i ... sub_i + @subSize]
-              for jj in [sub_j ... sub_j + @subSize]
-                used[@cell[ii][jj]] = true
-            # check for zero or unique unused value
-            unused =
-              for v in [1..9]
-                continue if used[v]
-                v
-            if unused.length == 0
-              dead = true
-              break
-            else if unused.length == 1
-              #if @validSetting i, j, unused
-              @cell[i][j] = unused[0]
-              implied.push [i, j]
-              anotherRound = true
-            unused
+            if @cell[i][j] == 0
+              used = {}
+              # row constraint
+              for jj in [0...@boardSize]
+                used[@cell[i][jj]] = true
+              # column constraint
+              for ii in [0...@boardSize]
+                used[@cell[ii][j]] = true
+              # 3x3 subgrid constraint
+              sub_i = (i // @subSize) * @subSize
+              sub_j = (j // @subSize) * @subSize
+              for ii in [sub_i ... sub_i + @subSize]
+                for jj in [sub_j ... sub_j + @subSize]
+                  used[@cell[ii][jj]] = true
+              # check for zero or unique unused value
+              unused =
+                for v in [1..9]
+                  continue if used[v]
+                  v
+              if unused.length == 0
+                dead = true
+                break
+              else if unused.length == 1
+                #if @validSetting i, j, unused
+                @cell[i][j] = unused[0]
+                implied.push [i, j]
+                anotherRound = true
+              unused
+            else
+              null
       if dead
         @undoImplied implied
         return 'dead'
@@ -165,6 +167,18 @@ class Sudoku
   firstEmptyCell: ->
     @firstCellSatisfying (v) -> v == 0
 
+  bestEmptyCell: ->
+    for row, i in @unused
+      for cell, j in row when cell?
+        if not best? or cell.length < best
+          best = cell.length
+          iBest = i
+          jBest = j
+    if best?
+      [iBest, jBest]
+    else
+      null
+
   cellOptions: ->
     options = [1..@boardSize]
     if @randomize  # random permutation
@@ -182,7 +196,8 @@ class Sudoku
     implied = @fillImplied()
     if implied == 'dead'
       return
-    cell = @firstEmptyCell()
+    #cell = @firstEmptyCell()
+    cell = @bestEmptyCell()
     # Check for filled-in puzzle
     unless cell?
       yield @
