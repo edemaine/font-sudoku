@@ -179,6 +179,14 @@ class Sudoku
     else
       null
 
+  neighboringCells: (i, j) ->
+    cell for cell in [
+      [i-1, j]
+      [i+1, j]
+      [i, j-1]
+      [i, j+1]
+    ] when 0 <= cell[0] < @boardSize and 1 <= cell[1] < @boardSize
+
   cellOptions: ->
     options = [1..@boardSize]
     if @randomize  # random permutation
