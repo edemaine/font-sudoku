@@ -187,6 +187,11 @@ class Sudoku
       [i, j+1]
     ] when 0 <= cell[0] < @boardSize and 0 <= cell[1] < @boardSize
 
+  consecutiveNeighboringCells: (i, j) ->
+    return [] if @cell[i][j] == 0
+    [ii, jj] for [ii, jj] in @neighboringCells i, j \
+    when @cell[ii][jj] != 0 and 1 == Math.abs @cell[ii][jj] - @cell[i][j]
+
   cellOptions: ->
     options = [1..@boardSize]
     if @randomize  # random permutation
@@ -284,6 +289,29 @@ class Sudoku
       break unless cells.length
     @
 
+  longestPath: ->
+    longest = [] # longest path so far
+    count = 0    # number of paths of the current length
+    path = []    # current path (grown incrementally)
+    onPath = {}  # map for fast detection of which vertices are on path
+    recurse = (cell) =>
+      return if cell of onPath # avoid repeating vertices
+      path.push cell
+      onPath[cell] = true
+      if path.length > longest.length
+        longest = path[..]
+        count = 1
+      else if path.length == longest.length
+        count++
+      for neighbor from @consecutiveNeighboringCells cell...
+        recurse neighbor
+      delete onPath[cell]
+      path.pop()
+    for cell from @filledCells()
+      recurse cell
+    longest.count = count
+    longest
+
 exports = {Sudoku}
 (window ? module.exports)[key] = value for key, value of exports
 
@@ -367,7 +395,7 @@ designGui = ->
   designSVG = SVG 'design'
   resultSVG = SVG 'result'
   #sudoku = new Sudoku 3
-  sudoku = new Sudoku font.Q
+  sudoku = new Sudoku font.M
   sudoku.solve()
   gui = new SudokuGUI designSVG, sudoku
 
