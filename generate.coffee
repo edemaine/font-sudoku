@@ -12,9 +12,12 @@ generate = (letter) ->
           if solver.cell[i2][j2] != 0 and 1 == Math.abs solver.cell[i1][j1] - solver.cell[i2][j2]
             return true
     false
+  count = 0
   for solution from solver.solutions()
     console.log JSON.stringify solution.cell
     console.log "#{solution}"
+    count++
+  console.log "# #{count} solutions for #{letter}"
 
 if module? and module == require?.main
   for letter of font
