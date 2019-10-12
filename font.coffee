@@ -1,4 +1,4 @@
-{Sudoku} = require './sudoku' unless window?
+{Sudoku} = require './sudoku.coffee' unless window?
 
 font =
   A: [[0,0,0, 0,0,0, 0,0,0]

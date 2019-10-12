@@ -200,10 +200,11 @@ class Sudoku
     Generator for all solutions to a puzzle, yielding itself as it modifies
     into each solution.
     Clone each result or use `allSolutions` to store all solutions.
+    Add additional pruning rules by adding @prune function.
     ###
     implied = @fillImplied()
-    if implied == 'dead'
-      return
+    return if implied == 'dead'
+    return if @prune?()
     #cell = @firstEmptyCell()
     cell = @bestEmptyCell()
     # Check for filled-in puzzle

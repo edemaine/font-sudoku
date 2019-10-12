@@ -1,7 +1,7 @@
 ## Examples from
 ## https://py.mit.edu/_static/fall19/lectures/lecture04/lecture4.zip
 
-{Sudoku} = require './sudoku'
+{Sudoku} = require './sudoku.coffee'
 
 easy = [[5,1,7,6,0,0,0,3,4]
         [2,8,9,0,0,4,0,0,0]

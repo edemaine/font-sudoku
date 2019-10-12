@@ -1,29 +1,27 @@
-{Sudoku} = require './sudoku'
-{font} = require './font'
+{Sudoku} = require './sudoku.coffee'
+{font} = require './font.coffee'
 
 generate = (letter) ->
   sudoku = new Sudoku font[letter]
-  bad = true
-  while bad
-    solution = sudoku.clone().solve()
+  solver = sudoku.clone()
+  solver.prune = ->
     bad = false
     for [i1, j1] from sudoku.filledCells()
       for [i2, j2] from sudoku.neighboringCells i1, j1
         if sudoku.cell[i2][j2] == 0 # transition between blank and filled in input
-          if 1 == Math.abs solution.cell[i1][j1] - solution.cell[i2][j2]
-            bad = true
-            break
-      break if bad
-    unless bad
-      console.log JSON.stringify solution.cell
-      console.log "#{solution}"
-      break
+          if solver.cell[i2][j2] != 0 and 1 == Math.abs solver.cell[i1][j1] - solver.cell[i2][j2]
+            console.log "#{solver}"
+            console.log i1, j1, i2, j2
+            return true
+    false
+  for solution from solver.solutions()
+    console.log JSON.stringify solution.cell
+    console.log "#{solution}"
 
 if module? and module == require?.main
-  loop
-    for letter of font
-      if process.argv.length > 2
-        continue unless letter in process.argv
-      #continue if letter in ['D', 'M', 'N', 'Q', 'W']
-      console.log "# #{letter}"
-      generate letter
+  for letter of font
+    if process.argv.length > 2
+      continue unless letter in process.argv
+    #continue if letter in ['D', 'M', 'N', 'Q', 'W']
+    console.log "# #{letter}"
+    generate letter
