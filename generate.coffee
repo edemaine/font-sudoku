@@ -28,7 +28,7 @@ generate = (letter, permissive = false) ->
             return true if degree[[i1,j1]] == 1
             # Avoid extending neighbors of ends:
             for [i3, j3] from sudoku.neighboringCells i1, j1
-              return true if sudoku.cell[i3][j3] != 0 and degree[[i3,j3]] == 1
+              return true if sudoku.cell[i3][j3] != 0 and degree[[i3,j3]] == 1 and 1 == Math.abs sudoku.cell[i1][j1] - sudoku.cell[i3][j3]
             # Avoid double-extending other pixels:
             for [i3, j3] from sudoku.neighboringCells i2, j2
               continue if i1 == i3 and j1 == j3
