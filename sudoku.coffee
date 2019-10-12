@@ -204,7 +204,9 @@ class Sudoku
     ###
     implied = @fillImplied()
     return if implied == 'dead'
-    return if @prune?()
+    # Custom pruning rules
+    if @prune?()
+      return @undoImplied implied
     #cell = @firstEmptyCell()
     cell = @bestEmptyCell()
     # Check for filled-in puzzle

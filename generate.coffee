@@ -10,8 +10,6 @@ generate = (letter) ->
       for [i2, j2] from sudoku.neighboringCells i1, j1
         if sudoku.cell[i2][j2] == 0 # transition between blank and filled in input
           if solver.cell[i2][j2] != 0 and 1 == Math.abs solver.cell[i1][j1] - solver.cell[i2][j2]
-            console.log "#{solver}"
-            console.log i1, j1, i2, j2
             return true
     false
   for solution from solver.solutions()
