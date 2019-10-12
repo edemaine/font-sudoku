@@ -367,7 +367,7 @@ designGui = ->
   designSVG = SVG 'design'
   resultSVG = SVG 'result'
   #sudoku = new Sudoku 3
-  sudoku = new Sudoku font.A
+  sudoku = new Sudoku font.Q
   sudoku.solve()
   gui = new SudokuGUI designSVG, sudoku
 
