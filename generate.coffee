@@ -9,10 +9,11 @@ generate = (letter, mode = 'strict') ->
   connections hanging off of letter pixels, and there are no such connections
   from degree-1 pixels or their neighbors (thereby guaranteeing longest path).
   In 'longest' mode: Find any solution with unique longest path through the
-  letter pixels.
+  letter pixels.  Actually, this is checked in all modes, to make sure there
+  isn't some other giant component.
   ###
   sudoku = new Sudoku font[letter]
-  letterLength = sudoku.countFilledCells() - 1
+  letterLength = sudoku.countFilledCells()
   degree = {}
   for [i1, j1] from sudoku.filledCells()
     degree[[i1,j1]] = 0
@@ -39,16 +40,17 @@ generate = (letter, mode = 'strict') ->
                   continue if i1 == i3 and j1 == j3
                   if solver.cell[i3][j3] != 0 and 1 == Math.abs solver.cell[i2][j2] - solver.cell[i3][j3]
                     return true
-              when 'longest'
-                longest = solver.longestPath()
-                console.log "#{solver}"
-                console.log "#{longest.length} vs. #{letterLength}; #{longest.count} vs. 2"
-                console.assert longest.length >= letterLength,
-                  "Path too short: #{longest.length} should be >= #{letterLength}"
-                return true if longest.length != letterLength
-                console.assert longest.count >= 2,
-                  "#{longest.count} instances of longest path?!"
-                return true if longest.count != 2
+              #when 'longest'
+    longest = solver.longestPath()
+    #console.log "#{solver}"
+    #console.log longest
+    #console.log "#{longest.length} vs. #{letterLength}; #{longest.count} vs. 2"
+    console.assert longest.length >= letterLength,
+      "Path too short: #{longest.length} should be >= #{letterLength}"
+    return true if longest.length != letterLength
+    console.assert longest.count >= 2,
+      "#{longest.count} instances of longest path?!"
+    return true if longest.count != 2
     false
   count = 0
   for solution from solver.solutions()
@@ -64,7 +66,7 @@ if module? and module == require?.main
     console.log "# #{letter}"
     generate letter,
       switch letter
-        when 'M', 'N', 'W'
+        when 'N'
           'longest'
         when 'Q'
           'permissive'

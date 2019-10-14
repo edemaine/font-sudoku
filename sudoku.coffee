@@ -395,7 +395,8 @@ designGui = ->
   designSVG = SVG 'design'
   resultSVG = SVG 'result'
   #sudoku = new Sudoku 3
-  sudoku = new Sudoku font.M
+  #sudoku = new Sudoku font.M
+  sudoku = new Sudoku [[3,2,7,5,8,6,4,9,1],[8,5,9,7,1,4,3,2,6],[6,4,1,2,3,9,5,7,8],[7,8,2,9,4,3,6,1,5],[1,6,3,8,5,2,7,4,9],[5,9,4,1,6,7,8,3,2],[4,1,5,3,2,8,9,6,7],[9,3,8,6,7,1,2,5,4],[2,7,6,4,9,5,1,8,3]]
   sudoku.solve()
   gui = new SudokuGUI designSVG, sudoku
 
