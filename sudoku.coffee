@@ -439,10 +439,12 @@ class SudokuGUI
            1 == Math.abs number - @sudoku.cell[i-1][j]
           l = @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
           l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i-1][j]
+          l.addClass 'puzzle' if @puzzle?.cell[i][j] and @puzzle?.cell[i-1][j]
         if j > 0 and @sudoku.cell[i][j-1] and
            1 == Math.abs number - @sudoku.cell[i][j-1]
           l = @edgesGroup.line cj+0.5, ci+0.5, cj-0.5, ci+0.5
           l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i][j-1]
+          l.addClass 'puzzle' if @puzzle?.cell[i][j] and @puzzle?.cell[i][j-1]
 
 ## Based on meouw's answer on http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
 getOffset = (el) ->
