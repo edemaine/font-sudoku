@@ -484,6 +484,8 @@ designGui = ->
         [result] = result.generate 'strict', 1
       when 'permissive'
         [result] = result.generate 'permissive', 1
+      when 'longest'
+        [result] = result.generate 'longest', 1
     if result?
       new SudokuGUI resultSVG, result
     else
