@@ -27,6 +27,9 @@
       svg .edges line { stroke-width: 0.333; stroke: #cac; stroke-linecap: round; }
       svg .edges line.base { stroke-width: 0.666; stroke: #b8b; }
 
+      #output:not(.edges) svg .edges line:not(.base) { visibility: hidden; }
+      #output:not(.path) svg .edges line.base { visibility: hidden; }
+
       svg .target { fill: purple; }
       svg .target:hover { cursor: pointer; }
     </STYLE>

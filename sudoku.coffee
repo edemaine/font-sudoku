@@ -531,7 +531,11 @@ designGui = ->
 updateText = (changed) ->
   state = @getState()
   Box = SudokuGUI
+  document.getElementById 'output'
+  .setAttribute 'class',
+    (checkbox for checkbox in ['edges', 'path'] when state[checkbox]).join ' '
 
+  return unless changed.text
   charBoxes = {}
   output = document.getElementById 'output'
   output.innerHTML = '' ## clear previous children
