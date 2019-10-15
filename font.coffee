@@ -19,7 +19,7 @@ font =
       [0,0,0, 5,0,0, 2,0,0]
       [0,0,0, 4,3,2, 1,0,0]
       [0,0,0, 0,0,0, 0,0,0]]
-  # This B is a cycle and has no solution without extra edges:
+  # Alternative cyclic B:
   #B: [[0,0,0, 0,0,0, 0,0,0]
   #    [0,0,0, 0,0,0, 0,0,0]
   #    [0,0,0, 9,8,7, 6,0,0]

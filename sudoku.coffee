@@ -333,17 +333,17 @@ class Sudoku
                   continue if i1 == i3 and j1 == j3
                   return true
               #when 'longest'
-      longest = @longestPath()
+      longests = @longestPaths()
       #console.log "#{@}"
-      #console.log longest
-      #console.log "#{longest.length} vs. #{letterLength}; #{longest.count} vs. 2"
-      console.assert longest.length >= letterLength,
-        "Path too short: #{longest.length} should be >= #{letterLength}"
-      return true if longest.length != letterLength
-      console.assert longest.count >= 2,
-        "#{longest.count} instances of longest path?!"
-      return true if longest.count not in [2, 2*longest.length]
-                                         # path  cycle
+      #console.log longests
+      #console.log "#{longests[0].length} vs. #{letterLength}; #{longests.length} vs. 2"
+      console.assert longests.length > 0, "No longest paths?"
+      console.assert longests[0].length >= letterLength,
+        "Path too short: #{longests[0].length} should be >= #{letterLength}"
+      return true if longests[0].length != letterLength
+      for longest in longests
+        for [i, j] in longest
+          return true if original.cell[i][j] == 0 # path uses non-original cell
       false
     count = 0
     if num?
@@ -361,28 +361,25 @@ class Sudoku
         count++
     count
 
-  longestPath: ->
-    longest = [] # longest path so far
-    count = 0    # number of paths of the current length
-    path = []    # current path (grown incrementally)
-    onPath = {}  # map for fast detection of which vertices are on path
+  longestPaths: ->
+    longests = [] # all longest paths so far
+    path = []     # current path (grown incrementally)
+    onPath = {}   # map for fast detection of which vertices are on path
     recurse = (cell) =>
       return if cell of onPath # avoid repeating vertices
       path.push cell
       onPath[cell] = true
-      if path.length > longest.length
-        longest = path[..]
-        count = 1
-      else if path.length == longest.length
-        count++
+      if longests.length == 0 or path.length > longests[0].length
+        longests = [path[..]]
+      else if path.length == longests[0].length
+        longests.push path[..]
       for neighbor from @consecutiveNeighboringCells cell...
         recurse neighbor
       delete onPath[cell]
       path.pop()
     for cell from @filledCells()
       recurse cell
-    longest.count = count
-    longest
+    longests
 
 exports = {Sudoku}
 (window ? module.exports)[key] = value for key, value of exports
@@ -476,20 +473,23 @@ designGui = ->
     state = @getState()
     resultSVG.clear()
     result = sudoku.clone()
-    switch state.solve
-      when 'any'
-        result.solve()
-      when 'strict'
-        [result] = result.generate 'strict', 1
-      when 'permissive'
-        [result] = result.generate 'permissive', 1
-      when 'longest'
-        [result] = result.generate 'longest', 1
-    if result?
-      new SudokuGUI resultSVG, result
-    else
-      resultSVG.text "no solution"
-      resultSVG.viewbox {x: 0, y: -10, width: 80, height: 20}
+    try
+      switch state.solve
+        when 'any'
+          result.solve()
+        when 'strict'
+          [result] = result.generate 'strict', 1
+        when 'permissive'
+          [result] = result.generate 'permissive', 1
+        when 'longest'
+          [result] = result.generate 'longest', 1
+      if result?
+        new SudokuGUI resultSVG, result
+      else
+        resultSVG.text "no solution"
+        resultSVG.viewbox {x: 0, y: -10, width: 80, height: 20}
+    catch e
+      console.error e
   .syncState()
 
   document.getElementById 'resolve'
