@@ -482,7 +482,13 @@ designGui = ->
         result.solve()
       when 'strict'
         [result] = result.generate 'strict', 1
-    new SudokuGUI resultSVG, result
+      when 'permissive'
+        [result] = result.generate 'permissive', 1
+    if result?
+      new SudokuGUI resultSVG, result
+    else
+      resultSVG.text "no solution"
+      resultSVG.viewbox {x: -10, y: -10, width: 20, height: 20}
   .syncState()
 
   document.getElementById 'resolve'
