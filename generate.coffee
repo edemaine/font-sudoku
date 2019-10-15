@@ -13,21 +13,26 @@ if module? and module == require?.main
              "    base: #{JSON.stringify font[letter]},"
     sudoku = new Sudoku font[letter]
     count = 0
-    out.push "    gen: [" +
-      (for solution from sudoku.generate(
-        switch letter
-          when 'N'
-            'longest'
-          when 'Q'
-            'permissive'
-          else
-            'strict'
-      , num)
-        count++
-        JSON.stringify(solution.cell).replace /\s/g, ''
-      ).join(', ') + "]"
-    if count < num
+    solutions = (solution for solution from sudoku.generate(
+      switch letter
+        when 'N'
+          'longest'
+        when 'Q'
+          'permissive'
+        else
+          'strict'
+    , num))
+    if solutions.length < num
       console.log "Only #{count} solutions found! :-("
+    out.push "    gen: [" + (
+      for solution in solutions
+        JSON.stringify(solution.cell).replace /\s/g, ''
+    ).join(', ') + "],"
+    out.push "    puzzle: [" + (
+      for solution in solutions
+        solution.reduceImplied()
+        JSON.stringify(solution.cell).replace /\s/g, ''
+    ).join(', ') + "]"
     out.push "  },"
   # remove final comma
   out.pop()

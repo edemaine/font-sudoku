@@ -27,8 +27,9 @@
       svg .edges line { stroke-width: 0.333; stroke: #cac; stroke-linecap: round; }
       svg .edges line.base { stroke-width: 0.666; stroke: #b8b; }
 
-      #output:not(.edges) svg .edges line:not(.base) { visibility: hidden; }
-      #output:not(.path) svg .edges line.base { visibility: hidden; }
+      .root:not(.edges) svg .edges line:not(.base) { visibility: hidden; }
+      .root:not(.path) svg .edges line.base { visibility: hidden; }
+      .root.puzzle svg .numbers text:not(.puzzle) { visibility: hidden; }
 
       svg .target { fill: purple; }
       svg .target:hover { cursor: pointer; }
@@ -143,6 +144,11 @@ input[type=range]:focus::-ms-fill-upper {
           <TEXTAREA NAME="text" ID="text" ROWS=4 COLS=40>text</TEXTAREA>
         </TD>
         <TD>
+          <INPUT TYPE="radio" CHECKED NAME="mode" VALUE="solved" ID="solvedMode"> <LABEL FOR="solvedMode">Solved</LABEL>
+          <BR>
+          <INPUT TYPE="radio" NAME="mode" VALUE="puzzle" ID="puzzleMode"> <LABEL FOR="puzzleMode">Puzzle</LABEL>
+        </TD>
+        <TD>
           <INPUT TYPE="checkbox" CHECKED ID="edges"> <LABEL FOR="edges">Consecutive edges</LABEL>
           <BR>
           <INPUT TYPE="checkbox" CHECKED ID="path"> <LABEL FOR="path">Longest path</LABEL>
@@ -153,7 +159,7 @@ input[type=range]:focus::-ms-fill-upper {
 
     <P>
 
-    <DIV id="output" STYLE="width: 100%">
+    <DIV id="output" STYLE="width: 100%" CLASS="root">
     </DIV>
 
     <HR>

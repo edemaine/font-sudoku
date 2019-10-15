@@ -391,7 +391,7 @@ SVG?.defaults.attrs['font-family'] = null
 SVG?.defaults.attrs['font-size'] = null
 
 class SudokuGUI
-  constructor: (@svg, @sudoku, @base) ->
+  constructor: (@svg, @sudoku, @base, @puzzle) ->
     @edgesGroup = @svg.group()
     .addClass 'edges'
     @gridGroup = @svg.group()
@@ -432,8 +432,9 @@ class SudokuGUI
         continue unless number
         ci = @coord i
         cj = @coord j
-        @numbersGroup.text "#{number}"
+        t = @numbersGroup.text "#{number}"
         .move cj+0.5, ci+0.15
+        t.addClass 'puzzle' if @puzzle?.cell[i][j] != 0
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
           l = @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
@@ -460,9 +461,6 @@ resize = (id) ->
 
 ## DESIGNER GUI
 
-designUpdate = ->
-  
-
 designGui = ->
   designSVG = SVG 'design'
   resultSVG = SVG 'result'
@@ -473,6 +471,8 @@ designGui = ->
   .addInputs()
   .on 'stateChange', ->
     state = @getState()
+    setClass 'design', state
+    setClass 'result', state
     resultSVG.clear()
     result = sudoku.clone()
     try
@@ -528,12 +528,17 @@ designGui = ->
 
 ## FONT GUI
 
+setClass = (id, state) ->
+  document.getElementById id
+  .setAttribute 'class',
+    (checkbox for checkbox in ['edges', 'path'] when state[checkbox])
+    .concat [state.mode, 'root']
+    .join ' '
+
 updateText = (changed) ->
   state = @getState()
   Box = SudokuGUI
-  document.getElementById 'output'
-  .setAttribute 'class',
-    (checkbox for checkbox in ['edges', 'path'] when state[checkbox]).join ' '
+  setClass 'output', state
 
   return unless changed.text
   charBoxes = {}
@@ -548,9 +553,10 @@ updateText = (changed) ->
       char = char.toUpperCase()
       if char of window.fontGen
         letter = window.fontGen[char]
-        gen = letter.gen[Math.floor letter.gen.length * Math.random()]
+        which = Math.floor letter.gen.length * Math.random()
         svg = SVG outputWord
-        box = new Box svg, (new Sudoku gen), (new Sudoku letter.base)
+        box = new Box svg, (new Sudoku letter.gen[which]),
+          (new Sudoku letter.base), (new Sudoku letter.puzzle[which])
         charBoxes[char] ?= []
         charBoxes[char].push box
         box.linked = charBoxes[char]
