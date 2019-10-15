@@ -60,6 +60,11 @@
           <INPUT TYPE="checkbox" CHECKED ID="path"> <LABEL FOR="path">Longest path</LABEL>
         </TD>
         <TD>
+          <INPUT TYPE="radio" CHECKED NAME="solve" VALUE="any" ID="solveAny"> <LABEL FOR="solveAny">Any solution</LABEL>
+          <BR>
+          <INPUT TYPE="radio" NAME="solve" VALUE="strict" ID="solveStrict"> <LABEL FOR="solveStrict">Strict solution (no extra attached edges)</LABEL>
+        </TD>
+        <TD>
           <BUTTON ID="downloadSVG">Download SVG</BUTTON>
           <A style="display: none" id="svglink"></A>
         </TD>

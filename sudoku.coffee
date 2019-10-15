@@ -289,6 +289,75 @@ class Sudoku
       break unless cells.length
     @
 
+  generate: (mode = 'strict', num) ->
+    ###
+    In 'strict' mode: Find a solution with no extra +-1 connections
+    hanging off of letter pixels.
+    In 'permissive' mode: Find a solution with no more than single +-1
+    connections hanging off of letter pixels, and there are no such connections
+    from degree-1 pixels or their neighbors (thereby guaranteeing longest path).
+    In 'longest' mode: Find any solution with unique longest path through the
+    letter pixels.  Actually, this is checked in all modes, to make sure there
+    isn't some other giant component.
+
+    If num is undefined (default), then generate all solutions exhaustively.
+    (Useful for checking whether there is a solution.)  Otherwise, generate the
+    specified number randomly, avoiding duplicates.
+    ###
+    letterLength = @countFilledCells()
+    degree = {}
+    for [i1, j1] from @filledCells()
+      degree[[i1,j1]] = 0
+      for [i2, j2] from @neighboringCells i1, j1
+        if @cell[i2][j2] != 0 and 1 == Math.abs @cell[i1][j1] - @cell[i2][j2]
+          degree[[i1,j1]]++
+    solver = @clone()
+    solver.prune = ->
+      for [i1, j1] from @filledCells()
+        for [i2, j2] from @neighboringCells i1, j1
+          if @cell[i2][j2] == 0 # transition between blank and filled in input
+            if solver.cell[i2][j2] != 0 and 1 == Math.abs solver.cell[i1][j1] - solver.cell[i2][j2]
+              switch mode
+                when 'strict'
+                  return true
+                when 'permissive'
+                  # Avoid extending the ends:
+                  return true if degree[[i1,j1]] == 1
+                  # Avoid extending neighbors of ends:
+                  for [i3, j3] from @neighboringCells i1, j1
+                    return true if @cell[i3][j3] != 0 and degree[[i3,j3]] == 1 and 1 == Math.abs @cell[i1][j1] - @cell[i3][j3]
+                  # Avoid double-extending other pixels:
+                  for [i3, j3] from @neighboringCells i2, j2
+                    continue if i1 == i3 and j1 == j3
+                    if solver.cell[i3][j3] != 0 and 1 == Math.abs solver.cell[i2][j2] - solver.cell[i3][j3]
+                      return true
+                #when 'longest'
+      longest = solver.longestPath()
+      #console.log "#{solver}"
+      #console.log longest
+      #console.log "#{longest.length} vs. #{letterLength}; #{longest.count} vs. 2"
+      console.assert longest.length >= letterLength,
+        "Path too short: #{longest.length} should be >= #{letterLength}"
+      return true if longest.length != letterLength
+      console.assert longest.count >= 2,
+        "#{longest.count} instances of longest path?!"
+      return true if longest.count != 2
+      false
+    count = 0
+    if num?
+      seen = {}
+      while count < num
+        solution = solver.clone().solve()
+        continue if solution.cell of seen
+        seen[solution.cell] = true
+        yield solution
+        count++
+    else
+      for solution from solver.solutions()
+        yield solution.clone()
+        count++
+    count
+
   longestPath: ->
     longest = [] # longest path so far
     count = 0    # number of paths of the current length
@@ -390,19 +459,28 @@ resize = (id) ->
 ## DESIGNER GUI
 
 designUpdate = ->
+  
 
 designGui = ->
   designSVG = SVG 'design'
   resultSVG = SVG 'result'
   #sudoku = new Sudoku 3
-  #sudoku = new Sudoku font.M
-  sudoku = new Sudoku [[2,5,9,7,1,6,4,3,8],[3,6,7,4,8,5,2,1,9],[8,4,1,2,3,9,5,7,6],[7,1,2,8,4,3,6,9,5],[6,8,3,9,5,2,7,4,1],[5,9,4,1,6,7,8,2,3],[1,7,5,3,2,8,9,6,4],[9,3,8,6,7,4,1,5,2],[4,2,6,5,9,1,3,8,7]]
-  sudoku.solve()
+  sudoku = new Sudoku font.O
   gui = new SudokuGUI designSVG, sudoku
 
   furls = new Furls()
   .addInputs()
-  .on 'stateChange', designUpdate
+  .on 'stateChange', ->
+    state = @getState()
+    resultSVG.clear()
+    result = sudoku.clone()
+    switch state.solve
+      when 'any'
+        result.solve()
+      when 'strict'
+        [result] = result.generate 'strict', 1
+    new SudokuGUI resultSVG, result
+        
   .syncState()
 
 ###
@@ -414,16 +492,6 @@ designGui = ->
       new Blob [explicit], type: "image/svg+xml"
     document.getElementById('svglink').download = 'chiaroscuro.svg'
     document.getElementById('svglink').click()
-
-  for event in ['input', 'change']
-    do (event) ->
-      for checkbox in checkboxes
-        document.getElementById(checkbox).addEventListener event,
-          -> designer.setState event == 'change'
-      for range in ranges
-        document.getElementById(range).addEventListener event, ->
-          designer.setState event == 'change'
-          designer.patternChange()
 ###
 
   window.addEventListener 'resize', -> resize 'gui'
