@@ -30,6 +30,7 @@
       svg .squares rect { fill: #ddd; }
 
       .root:not(.edges) svg .edges line:not(.base) { visibility: hidden; }
+      .root:not(.edges):not(.path) svg .edges line.base { visibility: hidden; }
       .root.puzzle svg .numbers text:not(.puzzle) { visibility: hidden; }
       .root.puzzle svg .edges line:not(.puzzle) { visibility: hidden; }
 
