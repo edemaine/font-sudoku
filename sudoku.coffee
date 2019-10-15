@@ -467,8 +467,7 @@ designUpdate = ->
 designGui = ->
   designSVG = SVG 'design'
   resultSVG = SVG 'result'
-  #sudoku = new Sudoku 3
-  sudoku = new Sudoku font.B
+  sudoku = new Sudoku 3
   gui = new SudokuGUI designSVG, sudoku
 
   furls = new Furls()
@@ -490,11 +489,26 @@ designGui = ->
       new SudokuGUI resultSVG, result
     else
       resultSVG.text "no solution"
-      resultSVG.viewbox {x: -10, y: -10, width: 20, height: 20}
+      resultSVG.viewbox {x: 0, y: -10, width: 80, height: 20}
   .syncState()
 
   document.getElementById 'resolve'
   .addEventListener 'click', -> furls.trigger 'stateChange'
+
+  document.getElementById 'loadFont'
+  .appendChild select = document.createElement 'select'
+  select.appendChild option = document.createElement 'option'
+  option.setAttribute 'selected', true
+  for char of window.font
+    select.appendChild option = document.createElement 'option'
+    option.setAttribute 'value', char
+    option.appendChild document.createTextNode char
+  select.addEventListener 'change', (e) ->
+    return unless e.target.value of window.font
+    sudoku = new Sudoku window.font[e.target.value]
+    designSVG.clear()
+    gui = new SudokuGUI designSVG, sudoku
+    furls.trigger 'stateChange'
 
 ###
   document.getElementById 'clear'
