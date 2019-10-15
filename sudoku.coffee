@@ -391,7 +391,7 @@ SVG?.defaults.attrs['font-family'] = null
 SVG?.defaults.attrs['font-size'] = null
 
 class SudokuGUI
-  constructor: (@svg, @sudoku) ->
+  constructor: (@svg, @sudoku, @base) ->
     @edgesGroup = @svg.group()
     .addClass 'edges'
     @gridGroup = @svg.group()
@@ -436,10 +436,12 @@ class SudokuGUI
         .move cj+0.5, ci+0.15
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
-          @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
+          l = @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
+          l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i-1][j]
         if j > 0 and @sudoku.cell[i][j-1] and
            1 == Math.abs number - @sudoku.cell[i][j-1]
-          @edgesGroup.line cj+0.5, ci+0.5, cj-0.5, ci+0.5
+          l = @edgesGroup.line cj+0.5, ci+0.5, cj-0.5, ci+0.5
+          l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i][j-1]
 
 ## Based on meouw's answer on http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
 getOffset = (el) ->
@@ -484,7 +486,7 @@ designGui = ->
         when 'longest'
           [result] = result.generate 'longest', 1
       if result?
-        new SudokuGUI resultSVG, result
+        new SudokuGUI resultSVG, result, sudoku
       else
         resultSVG.text "no solution"
         resultSVG.viewbox {x: 0, y: -10, width: 80, height: 20}
@@ -542,9 +544,9 @@ updateText = (changed) ->
       char = char.toUpperCase()
       if char of window.fontGen
         letter = window.fontGen[char]
-        letter = letter.gen[Math.floor letter.gen.length * Math.random()]
+        gen = letter.gen[Math.floor letter.gen.length * Math.random()]
         svg = SVG outputWord
-        box = new Box svg, new Sudoku letter
+        box = new Box svg, (new Sudoku gen), (new Sudoku letter.base)
         charBoxes[char] ?= []
         charBoxes[char].push box
         box.linked = charBoxes[char]
