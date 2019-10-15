@@ -37,10 +37,12 @@ class Sudoku
     s
 
   clone: ->
-    new Sudoku(
+    copy = new Sudoku(
       for row in @cell
         row[..]
     )
+    copy.prune = @prune if @prune?
+    copy
 
   validSetting: (i, j, v) ->
     ## Would setting [i,j] to v not violate any Sudoku constraints?
@@ -308,32 +310,31 @@ class Sudoku
     degree = {}
     for [i1, j1] from @filledCells()
       degree[[i1,j1]] = 0
-      for [i2, j2] from @neighboringCells i1, j1
-        if @cell[i2][j2] != 0 and 1 == Math.abs @cell[i1][j1] - @cell[i2][j2]
-          degree[[i1,j1]]++
+      for [i2, j2] from @consecutiveNeighboringCells i1, j1
+        degree[[i1,j1]]++
+    original = @
     solver = @clone()
-    solver.prune = ->
-      for [i1, j1] from @filledCells()
-        for [i2, j2] from @neighboringCells i1, j1
-          if @cell[i2][j2] == 0 # transition between blank and filled in input
-            if solver.cell[i2][j2] != 0 and 1 == Math.abs solver.cell[i1][j1] - solver.cell[i2][j2]
-              switch mode
-                when 'strict'
+    solver.prune = -> # @ = solved state
+      for [i1, j1] from original.filledCells()
+        console.assert @cell[i1][j1] != 0, "Missing clue #{i1},#{j1} = #{original.cell[i1][j1]} in solved state"
+        for [i2, j2] from @consecutiveNeighboringCells i1, j1
+          if original.cell[i2][j2] == 0 # transition between blank and filled in input
+            switch mode
+              when 'strict'
+                return true
+              when 'permissive'
+                # Avoid extending the ends:
+                return true if degree[[i1,j1]] == 1
+                # Avoid extending neighbors of ends:
+                for [i3, j3] from original.consecutiveNeighboringCells i1, j1
+                  return true if degree[[i3,j3]] == 1
+                # Avoid double-extending other pixels:
+                for [i3, j3] from @consecutiveNeighboringCells i2, j2
+                  continue if i1 == i3 and j1 == j3
                   return true
-                when 'permissive'
-                  # Avoid extending the ends:
-                  return true if degree[[i1,j1]] == 1
-                  # Avoid extending neighbors of ends:
-                  for [i3, j3] from @neighboringCells i1, j1
-                    return true if @cell[i3][j3] != 0 and degree[[i3,j3]] == 1 and 1 == Math.abs @cell[i1][j1] - @cell[i3][j3]
-                  # Avoid double-extending other pixels:
-                  for [i3, j3] from @neighboringCells i2, j2
-                    continue if i1 == i3 and j1 == j3
-                    if solver.cell[i3][j3] != 0 and 1 == Math.abs solver.cell[i2][j2] - solver.cell[i3][j3]
-                      return true
-                #when 'longest'
-      longest = solver.longestPath()
-      #console.log "#{solver}"
+              #when 'longest'
+      longest = @longestPath()
+      #console.log "#{@}"
       #console.log longest
       #console.log "#{longest.length} vs. #{letterLength}; #{longest.count} vs. 2"
       console.assert longest.length >= letterLength,
@@ -341,13 +342,15 @@ class Sudoku
       return true if longest.length != letterLength
       console.assert longest.count >= 2,
         "#{longest.count} instances of longest path?!"
-      return true if longest.count != 2
+      return true if longest.count not in [2, 2*longest.length]
+                                         # path  cycle
       false
     count = 0
     if num?
       seen = {}
       while count < num
         solution = solver.clone().solve()
+        break unless solution?
         continue if solution.cell of seen
         seen[solution.cell] = true
         yield solution

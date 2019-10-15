@@ -4,7 +4,7 @@ fs = require 'fs'
 
 if module? and module == require?.main
   out = ['(window || module.exports).fontGen = {']
-  num = 128
+  num = 81 #9*9
   for letter of font
     if process.argv.length > 2
       continue unless letter in process.argv
@@ -12,6 +12,7 @@ if module? and module == require?.main
     out.push "  '#{letter}': {",
              "    base: #{JSON.stringify font[letter]},"
     sudoku = new Sudoku font[letter]
+    count = 0
     out.push "    gen: [" +
       (for solution from sudoku.generate(
         switch letter
@@ -22,8 +23,11 @@ if module? and module == require?.main
           else
             'strict'
       , num)
+        count++
         JSON.stringify(solution.cell).replace /\s/g, ''
       ).join(', ') + "]"
+    if count < num
+      console.log "Only #{count} solutions found! :-("
     out.push "  },"
   # remove final comma
   out.pop()
