@@ -16,7 +16,7 @@ if module? and module == require?.main
     out.push "    gen: [" +
       (for solution from sudoku.generate(
         switch letter
-          when 'N'
+          when 'B', 'I', 'L', 'N', 'P', 'T'
             'longest'
           when 'Q'
             'permissive'
@@ -33,5 +33,5 @@ if module? and module == require?.main
   out.pop()
   out.push "  }"
   out.push "};", ""
-  fs.writeFileSync 'fontGen.js', out.join '\n'
+  fs.writeFileSync 'fontGen.js', out.join '\n' if process.argv.length <= 2
   console.log "Wrote #{num} solutions to fontGen.js"
