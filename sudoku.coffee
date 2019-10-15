@@ -445,8 +445,9 @@ updateText = (changed) ->
     outputWord.setAttribute 'class', 'word'
     for char, c in line
       char = char.toUpperCase()
-      if char of window.font
-        letter = window.font[char]
+      if char of window.fontGen
+        letter = window.fontGen[char]
+        letter = letter.gen[Math.floor letter.gen.length * Math.random()]
         svg = SVG outputWord
         box = new Box svg, new Sudoku letter
         charBoxes[char] ?= []
