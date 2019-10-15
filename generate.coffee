@@ -1,7 +1,8 @@
+fs = require 'fs'
 {Sudoku} = require './sudoku.coffee'
 {font} = require './font.coffee'
 
-generate = (letter, mode = 'strict') ->
+generate = (letter, mode = 'strict', num) ->
   ###
   In 'strict' mode: Find a solution with no extra +-1 connections
   hanging off of letter pixels.
@@ -11,6 +12,10 @@ generate = (letter, mode = 'strict') ->
   In 'longest' mode: Find any solution with unique longest path through the
   letter pixels.  Actually, this is checked in all modes, to make sure there
   isn't some other giant component.
+
+  If num is undefined (default), then generate all solutions exhaustively.
+  (Useful for checking whether there is a solution.)  Otherwise, generate the
+  specified number randomly, avoiding duplicates.
   ###
   sudoku = new Sudoku font[letter]
   letterLength = sudoku.countFilledCells()
@@ -53,22 +58,47 @@ generate = (letter, mode = 'strict') ->
     return true if longest.count != 2
     false
   count = 0
-  for solution from solver.solutions()
-    console.log JSON.stringify solution.cell
-    console.log "#{solution}"
-    count++
-  console.log "# #{count} solutions for #{letter}"
+  if num?
+    seen = {}
+    while count < num
+      solution = solver.clone().solve()
+      continue if solution.cell of seen
+      seen[solution.cell] = true
+      yield solution
+      count++
+  else
+    for solution from solver.solutions()
+      yield solution.clone()
+      count++
+    console.log "# #{count} solutions for #{letter}"
+  console.log JSON.stringify solution.cell
+  console.log "#{solution}"
 
 if module? and module == require?.main
+  out = ['(window || module.exports).fontGen = {']
+  num = 128
   for letter of font
     if process.argv.length > 2
       continue unless letter in process.argv
     console.log "# #{letter}"
-    generate letter,
-      switch letter
-        when 'N'
-          'longest'
-        when 'Q'
-          'permissive'
-        else
-          'strict'
+    out.push "  '#{letter}': {",
+             "    base: #{JSON.stringify font[letter]},"
+    out.push "    gen: [" +
+      (for solution from generate(letter,
+        switch letter
+          when 'N'
+            'longest'
+          when 'Q'
+            'permissive'
+          else
+            'strict'
+      , num)
+        JSON.stringify(solution.cell).replace /\s/g, ''
+      ).join(', ') + "]"
+    out.push "  },"
+  # remove final comma
+  out.pop()
+  out.push "  }"
+  out.push "};", ""
+  fs.writeFileSync 'fontGen.js', out.join '\n'
+  console.log "Wrote #{num} solutions to fontGen.js"
