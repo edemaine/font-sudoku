@@ -468,7 +468,7 @@ designGui = ->
   designSVG = SVG 'design'
   resultSVG = SVG 'result'
   #sudoku = new Sudoku 3
-  sudoku = new Sudoku font.O
+  sudoku = new Sudoku font.B
   gui = new SudokuGUI designSVG, sudoku
 
   furls = new Furls()
@@ -483,8 +483,10 @@ designGui = ->
       when 'strict'
         [result] = result.generate 'strict', 1
     new SudokuGUI resultSVG, result
-        
   .syncState()
+
+  document.getElementById 'resolve'
+  .addEventListener 'click', -> furls.trigger 'stateChange'
 
 ###
   document.getElementById 'clear'
