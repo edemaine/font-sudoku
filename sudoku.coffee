@@ -392,6 +392,8 @@ SVG?.defaults.attrs['font-size'] = null
 
 class SudokuGUI
   constructor: (@svg, @sudoku, @base, @puzzle) ->
+    @squaresGroup = @svg.group()
+    .addClass 'squares'
     @edgesGroup = @svg.group()
     .addClass 'edges'
     @gridGroup = @svg.group()
@@ -426,6 +428,7 @@ class SudokuGUI
   drawNumbers: ->
     @edgesGroup.clear()
     @numbersGroup.clear()
+    @squaresGroup.clear()
     for i in [0...@sudoku.boardSize]
       for j in [0...@sudoku.boardSize]
         number = @sudoku.cell[i][j]
@@ -434,7 +437,10 @@ class SudokuGUI
         cj = @coord j
         t = @numbersGroup.text "#{number}"
         .move cj+0.5, ci+0.15
-        t.addClass 'puzzle' if @puzzle?.cell[i][j] != 0
+        if @puzzle?.cell[i][j] != 0
+          t.addClass 'puzzle'
+          @squaresGroup.rect 1, 1
+          .move cj, ci
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
           l = @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5

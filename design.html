@@ -24,8 +24,10 @@
       svg .grid line.border { stroke-width: 0.15; stroke: black; }
 
       svg .numbers text { text-anchor: middle; font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 0.6px; }
+      /* bolder puzzle numbers: svg .numbers text.puzzle { font-weight: 700; }*/
       svg .edges line { stroke-width: 0.333; stroke: #cac; stroke-linecap: round; }
       .root.path svg .edges line.base { stroke-width: 0.666; stroke: #b8b; }
+      svg .squares rect { fill: #ddd; }
 
       .root:not(.edges) svg .edges line:not(.base) { visibility: hidden; }
       .root.puzzle svg .numbers text:not(.puzzle) { visibility: hidden; }
