@@ -16,7 +16,7 @@ if module? and module == require?.main
     out.push "    gen: [" +
       (for solution from sudoku.generate(
         switch letter
-          when 'B', 'I', 'L', 'N', 'P', 'T'
+          when 'I', 'L', 'N', 'P', 'T'
             'longest'
           when 'Q'
             'permissive'
