@@ -438,6 +438,7 @@ class SudokuGUI
     @edgesGroup.clear()
     @numbersGroup.clear()
     @squaresGroup.clear()
+    @squares = {}
     @userNumbers = {}
     for i in [0...@sudoku.boardSize]
       for j in [0...@sudoku.boardSize]
@@ -449,7 +450,7 @@ class SudokuGUI
         #.move cj+0.5, ci+0.15
         .attr 'x', cj+0.5
         .attr 'y', ci+0.7
-        square = @squaresGroup.rect 1, 1
+        @squares[[i,j]] = square = @squaresGroup.rect 1, 1
         .move cj, ci
         if @puzzle?.cell[i][j] != 0
           #t.addClass 'puzzle'
@@ -460,13 +461,8 @@ class SudokuGUI
           .attr 'x', cj+0.5
           .attr 'y', ci+0.7
           .addClass 'user'
-          do (i, j, square) =>
-            square.click click = =>
-              for element in document.getElementsByClassName 'selected'
-                element.classList.remove 'selected'
-              square.addClass 'selected'
-              @selected = [i, j]
-              selected = @
+          do (i, j) =>
+            square.click click = => @select i, j
             @userNumbers[[i,j]].click click
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
@@ -484,6 +480,21 @@ class SudokuGUI
     @user.cell[i][j] = value
     @userNumbers[[i,j]].text "#{@user.cell[i][j] or ''}"
 
+  select: (i, j) ->
+    for element in document.getElementsByClassName 'selected'
+      element.classList.remove 'selected'
+    @squares[[i,j]].addClass 'selected'
+    @selected = [i, j]
+    selected = @
+  selectMove: (di, dj) ->
+    return unless @selected? and selected == @
+    [i, j] = @selected
+    loop
+      i = (i + di) %% @sudoku.boardSize
+      j = (j + dj) %% @sudoku.boardSize
+      break if @puzzle?.cell[i][j] == 0
+    @select i, j
+
 numberInput = ->
   window.addEventListener 'keyup', (e) ->
     return unless selected?
@@ -496,11 +507,16 @@ numberInput = ->
     if num?
       selected.set selected.selected, num
     else
-      #switch e.key
-      #  when 'h', 'Left'
-      #    if selected.selected[0] > 0
-      #      selected.selected[0] -= 1
-      #  else
+      switch e.key
+        when 'h', 'ArrowLeft'
+          selected.selectMove 0, -1
+        when 'l', 'ArrowRight'
+          selected.selectMove 0, +1
+        when 'j', 'ArrowDown'
+          selected.selectMove +1, 0
+        when 'k', 'ArrowUp'
+          selected.selectMove -1, 0
+        else
           stop = false
     if stop
       e.preventDefault()
