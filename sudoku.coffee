@@ -390,8 +390,17 @@ exports = {Sudoku}
 SVG?.defaults.attrs['font-family'] = null
 SVG?.defaults.attrs['font-size'] = null
 
+selected = null
+
 class SudokuGUI
-  constructor: (@svg, @sudoku, @base, @puzzle) ->
+  constructor: (@svg, @sudoku, @base, @puzzle, @user) ->
+    # Intent:
+    # * @sudoku is the generated full solution compatible with @base;
+    # * @base is the clues that form the letter; and
+    # * @puzzle is the generated puzzle with enough clues to be unique.
+    # * @user consists of @puzzle plus the user-input clues
+    # However, @sudoku can be a partial solution in case of designer.
+    @user ?= @puzzle.clone()
     @squaresGroup = @svg.group()
     .addClass 'squares'
     @edgesGroup = @svg.group()
@@ -429,6 +438,7 @@ class SudokuGUI
     @edgesGroup.clear()
     @numbersGroup.clear()
     @squaresGroup.clear()
+    @userNumbers = {}
     for i in [0...@sudoku.boardSize]
       for j in [0...@sudoku.boardSize]
         number = @sudoku.cell[i][j]
@@ -436,11 +446,28 @@ class SudokuGUI
         ci = @coord i
         cj = @coord j
         t = @numbersGroup.text "#{number}"
-        .move cj+0.5, ci+0.15
+        #.move cj+0.5, ci+0.15
+        .attr 'x', cj+0.5
+        .attr 'y', ci+0.7
+        square = @squaresGroup.rect 1, 1
+        .move cj, ci
         if @puzzle?.cell[i][j] != 0
-          t.addClass 'puzzle'
-          @squaresGroup.rect 1, 1
-          .move cj, ci
+          #t.addClass 'puzzle'
+          square.addClass 'puzzle'
+        else
+          t.addClass 'solution'
+          @userNumbers[[i,j]] = @numbersGroup.text "#{@user.cell[i][j] or ''}"
+          .attr 'x', cj+0.5
+          .attr 'y', ci+0.7
+          .addClass 'user'
+          do (i, j, square) =>
+            square.click click = =>
+              for element in document.getElementsByClassName 'selected'
+                element.classList.remove 'selected'
+              square.addClass 'selected'
+              @selected = [i, j]
+              selected = @
+            @userNumbers[[i,j]].click click
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
           l = @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
@@ -451,6 +478,40 @@ class SudokuGUI
           l = @edgesGroup.line cj+0.5, ci+0.5, cj-0.5, ci+0.5
           l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i][j-1]
           l.addClass 'puzzle' if @puzzle?.cell[i][j] and @puzzle?.cell[i][j-1]
+
+  set: ([i, j], value) ->
+    #console.log 'setting', i, j, value
+    @user.cell[i][j] = value
+    @userNumbers[[i,j]].text "#{@user.cell[i][j] or ''}"
+
+numberInput = ->
+  window.addEventListener 'keyup', (e) ->
+    return unless selected?
+    num = null
+    if '0' <= e.key <= '9'
+      num = e.key.charCodeAt() - '0'.charCodeAt()
+    else if e.key in ['Delete', 'Backspace']
+      num = 0
+    stop = true
+    if num?
+      selected.set selected.selected, num
+    else
+      #switch e.key
+      #  when 'h', 'Left'
+      #    if selected.selected[0] > 0
+      #      selected.selected[0] -= 1
+      #  else
+          stop = false
+    if stop
+      e.preventDefault()
+      e.stopPropagation()
+  for num in [0..9]
+    do (num) ->
+      document.getElementById("number#{num}")?.addEventListener 'click', (e) ->
+        return unless selected?
+        e.preventDefault()
+        e.stopPropagation()
+        selected.set selected.selected, num
 
 ## Based on meouw's answer on http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
 getOffset = (el) ->
@@ -549,6 +610,7 @@ updateText = (changed) ->
   setClass 'output', state
 
   return unless changed.text
+  selected = null
   charBoxes = {}
   output = document.getElementById 'output'
   output.innerHTML = '' ## clear previous children
@@ -599,6 +661,7 @@ fontGui = ->
   for event in ['input', 'propertychange']
     document.getElementById('size').addEventListener event, sizeUpdate
   sizeUpdate()
+  numberInput()
 
 ## GUI MAIN
 
