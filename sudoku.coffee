@@ -592,9 +592,10 @@ fontGui = ->
   .on 'stateChange', updateText
   .syncState()
 
-  window.addEventListener 'resize', ->
+  window.addEventListener 'resize', resize = ->
     document.getElementById('size').max =
       document.getElementById('size').scrollWidth - 30 - 2
+  resize()
   for event in ['input', 'propertychange']
     document.getElementById('size').addEventListener event, sizeUpdate
   sizeUpdate()
