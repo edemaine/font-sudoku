@@ -64,23 +64,29 @@ class Sudoku
           return false
     true
 
-  validBoard: ->
+  invalidCells: ->
     ## Does the entire board satisfy all Sudoku no-duplication constraints?
+    ## If not, return array of [i,j] cell coordinates with duplicate values.
+    bad = []
     # row constraint
     for i in [0...@boardSize]
       seen = {}
-      for v in @cell[i]
+      for v, j in @cell[i]
         if seen[v]
-          return false
-        seen[v] = true
+          bad.push [i, seen[v]]
+          bad.push [i, j]
+        else
+          seen[v] = j
     # column constraint
     for j in [0...@boardSize]
       seen = {}
       for i in [0...@boardSize]
         v = @cell[i][j]
         if seen[v]
-          return false
-        seen[v] = true
+          bad.push [seen[v], j]
+          bad.push [i, j]
+        else
+          seen[v] = i
     # 3x3 subgrid constraint
     for sub_i in [0 ... @boardSize // @subSize]
       for sub_j in [0 ... @boardSize // @subSize]
@@ -89,9 +95,11 @@ class Sudoku
           for j in [sub_j ... sub_j + @subSize]
             v = @cell[i][j]
             if seen[v]
-              return false
-            seen[v] = true
-    True
+              bad.push seen[v]
+              bad.push [i, j]
+            else
+              seen[v] = [i, j]
+    bad
 
   fillImplied: ->
     implied = []
