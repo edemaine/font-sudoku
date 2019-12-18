@@ -28,7 +28,11 @@
       .root.puzzle svg .numbers text.invalid { fill: hsl(0,100%,40%); stroke: hsl(0,100%,60%); stroke-width: 0.02; } /* cf. NYTimes #ff4b56 */
 
       svg .edges line { stroke-width: 0.333; stroke: #cac; stroke-linecap: round; }
-      .root.path svg .edges line.base { stroke-width: 0.666; stroke: #b8b; }
+      .root.path:not(.puzzle) svg .edges line.base,
+      .root.path svg.solved .edges line.base { stroke-width: 0.666; stroke: #b8b; }
+      .root.puzzle .edges.solved { visibility: hidden; }
+      .root:not(.puzzle) .edges.user { visibility: hidden; }
+
       svg .squares rect.puzzle { fill: #ddd; }
       svg .squares rect { fill: white; }
       .root.hints.puzzle svg .squares rect.hint { fill: hsl(140,70%,85%); }
@@ -40,11 +44,15 @@
       .root:not(.edges):not(.path) svg .edges line.base { visibility: hidden; }
       .root.puzzle svg .numbers text.solution { visibility: hidden; }
       .root:not(.puzzle) svg .numbers text.user { visibility: hidden; }
-      .root.puzzle svg .edges line:not(.puzzle) { visibility: hidden; }
 
       svg .target { fill: purple; }
       svg .target:hover { cursor: pointer; }
       svg { user-select: none; }
+
+      .root.puzzle svg.solved { outline: solid gold 3px; } /* gold = hsl(52,89%,55%) */
+      .root.puzzle svg.solved .grid line:not(.border) { stroke: hsl(52,30%,40%); }
+      .root.puzzle svg.solved .squares rect { fill: hsl(52,89%,98%); }
+      .root.puzzle svg.solved .squares rect.puzzle { fill: hsl(52,30%,87%); }
 
       #numbers { position: fixed; top: 0; left: 0; right: 0; text-align: center; }
       #numbers div { display: inline-block; border: solid;

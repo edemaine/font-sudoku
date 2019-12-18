@@ -44,6 +44,13 @@ class Sudoku
     copy.prune = @prune if @prune?
     copy
 
+  complete: ->
+    for i in [0...@boardSize]
+      for j in [0...@boardSize]
+        if @cell[i][j] == 0
+          return false
+    true
+
   validSetting: (i, j, v) ->
     ## Would setting [i,j] to v not violate any Sudoku constraints?
     ## Existing setting for [i,j] should be null, to avoid false detection.
@@ -425,6 +432,10 @@ class SudokuGUI
     @squaresGroup = @svg.group()
     .addClass 'squares'
     @edgesGroup = @svg.group()
+    .addClass 'solved'
+    .addClass 'edges'
+    @userEdgesGroup = @svg.group()
+    .addClass 'user'
     .addClass 'edges'
     @gridGroup = @svg.group()
     .addClass 'grid'
@@ -502,7 +513,7 @@ class SudokuGUI
     # Detect invalid squares
     for element in @svg.find '.invalid'
       element.removeClass 'invalid'
-    for bad in @user.invalidCells()
+    for bad in invalid = @user.invalidCells()
       @puzzleNumbers[bad].addClass 'invalid'
 
     # Detect hints (uniquely fillable squares)
@@ -510,6 +521,29 @@ class SudokuGUI
       element.removeClass 'hint'
     for hint in @user.hints()
       @squares[hint].addClass 'hint'
+
+    # Draw lines
+    @userEdgesGroup.clear()
+    for i in [0...@user.boardSize]
+      for j in [0...@user.boardSize]
+        number = @user.cell[i][j]
+        continue unless number
+        ci = @coord i
+        cj = @coord j
+        if i > 0 and @user.cell[i-1][j] and
+           1 == Math.abs number - @user.cell[i-1][j]
+          l = @userEdgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
+          l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i-1][j]
+        if j > 0 and @user.cell[i][j-1] and
+           1 == Math.abs number - @user.cell[i][j-1]
+          l = @userEdgesGroup.line cj+0.5, ci+0.5, cj-0.5, ci+0.5
+          l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i][j-1]
+
+    # Check whether completely solved
+    if invalid.length == 0 and @user.complete()
+      @svg.addClass 'solved'
+    else
+      @svg.removeClass 'solved'
 
   set: ([i, j], value) ->
     #console.log 'setting', i, j, value
