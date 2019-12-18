@@ -745,6 +745,9 @@ fontGui = ->
   .on 'stateChange', updateText
   .syncState()
 
+  document.getElementById 'randomize'
+  .addEventListener 'click', -> updateText.call furls, text: true # force
+
   window.addEventListener 'resize', resize = ->
     document.getElementById('size').max =
       document.getElementById('size').scrollWidth - 30 - 2

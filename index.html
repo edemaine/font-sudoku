@@ -17,6 +17,8 @@
       }
       TEXTAREA { vertical-align: middle; }
 
+      TD { vertical-align: top; }
+
       /* NYTimes uses #959595 for inner lines, nyt-franklin for font */
 
       /* These widths must match minorWidth and majorWidth in sudoku.coffee */
@@ -189,6 +191,8 @@ input[type=range]:focus::-ms-fill-upper {
           <INPUT TYPE="radio" CHECKED NAME="mode" VALUE="solved" ID="solvedMode"><LABEL FOR="solvedMode">Solved</LABEL>
           <BR>
           <INPUT TYPE="radio" NAME="mode" VALUE="puzzle" ID="puzzleMode"><LABEL FOR="puzzleMode">Puzzle</LABEL>
+          <P>
+          <BUTTON ID="randomize">Randomize</BUTTON>
         </TD>
         <TD>
           <INPUT TYPE="checkbox" CHECKED ID="edges"><LABEL FOR="edges">Consecutive edges</LABEL>
