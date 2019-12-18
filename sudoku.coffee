@@ -72,32 +72,34 @@ class Sudoku
     for i in [0...@boardSize]
       seen = {}
       for v, j in @cell[i]
-        if seen[v]
+        if seen[v]?
           bad.push [i, seen[v]]
           bad.push [i, j]
-        else
+        else if v
           seen[v] = j
     # column constraint
     for j in [0...@boardSize]
       seen = {}
       for i in [0...@boardSize]
         v = @cell[i][j]
-        if seen[v]
+        if seen[v]?
           bad.push [seen[v], j]
           bad.push [i, j]
-        else
+        else if v
           seen[v] = i
     # 3x3 subgrid constraint
     for sub_i in [0 ... @boardSize // @subSize]
+      sub_i *= @subSize
       for sub_j in [0 ... @boardSize // @subSize]
+        sub_j *= @subSize
         seen = {}
         for i in [sub_i ... sub_i + @subSize]
           for j in [sub_j ... sub_j + @subSize]
             v = @cell[i][j]
-            if seen[v]
+            if seen[v]?
               bad.push seen[v]
               bad.push [i, j]
-            else
+            else if v
               seen[v] = [i, j]
     bad
 
@@ -443,7 +445,7 @@ class SudokuGUI
     @numbersGroup.clear()
     @squaresGroup.clear()
     @squares = {}
-    @userNumbers = {}
+    @puzzleNumbers = {}
     for i in [0...@sudoku.boardSize]
       for j in [0...@sudoku.boardSize]
         number = @sudoku.cell[i][j]
@@ -458,16 +460,17 @@ class SudokuGUI
         .move cj, ci
         if @puzzle?.cell[i][j] != 0
           #t.addClass 'puzzle'
+          @puzzleNumbers[[i,j]] = t
           square.addClass 'puzzle'
         else
           t.addClass 'solution'
-          @userNumbers[[i,j]] = @numbersGroup.text "#{@user.cell[i][j] or ''}"
+          @puzzleNumbers[[i,j]] = @numbersGroup.text "#{@user.cell[i][j] or ''}"
           .attr 'x', cj+0.5
           .attr 'y', ci-0.05
           .addClass 'user'
           do (i, j) =>
             square.click click = => @select i, j
-            @userNumbers[[i,j]].click click
+            @puzzleNumbers[[i,j]].click click
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
           l = @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
@@ -479,12 +482,22 @@ class SudokuGUI
           l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i][j-1]
           l.addClass 'puzzle' if @puzzle?.cell[i][j] and @puzzle?.cell[i][j-1]
 
+  updateValid: ->
+    for element in @svg.find '.invalid'
+      element.removeClass 'invalid'
+    for bad in @user.invalidCells()
+      @puzzleNumbers[bad].addClass 'invalid'
+
   set: ([i, j], value) ->
     #console.log 'setting', i, j, value
     @user.cell[i][j] = value
-    @userNumbers[[i,j]].text "#{@user.cell[i][j] or ''}"
+    @puzzleNumbers[[i,j]].text "#{@user.cell[i][j] or ''}"
+    @updateValid()
 
   select: (i, j) ->
+    # Selects cell (i,j) in this Sudoku GUI.  Selection needs to be
+    # page-global (because editing is controlled by keyboard and global
+    # buttons), so we need to deselect everything in all Sudoku GUIs.
     for element in document.getElementsByClassName 'selected'
       element.classList.remove 'selected'
     @squares[[i,j]].addClass 'selected'

@@ -25,6 +25,8 @@
 
       svg .numbers text { text-anchor: middle; font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 0.6px; cursor: default; }
       /* bolder puzzle numbers: svg .numbers text.puzzle { font-weight: 700; }*/
+      .root.puzzle svg .numbers text.invalid { fill: hsl(0,100%,40%); stroke: hsl(0,100%,60%); stroke-width: 0.02; } /* cf. NYTimes #ff4b56 */
+
       svg .edges line { stroke-width: 0.333; stroke: #cac; stroke-linecap: round; }
       .root.path svg .edges line.base { stroke-width: 0.666; stroke: #b8b; }
       svg .squares rect.puzzle { fill: #ddd; }
@@ -47,9 +49,9 @@
       #numbers div { display: inline-block; border: solid;
         min-width: 20px; min-height: 20px; padding: 2px; text-align: center;
         font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 15px;
-        background: white; cursor: pointer;
+        background: #ddd; cursor: pointer;
       }
-      #numbers div:hover { background: yellow; }
+      #numbers div:hover { background: hsl(50,100%,80%); }
 
 /* from http://danielstern.ca/range.css/ */
 input[type=range] {
