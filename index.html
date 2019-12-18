@@ -29,8 +29,8 @@
       .root.path svg .edges line.base { stroke-width: 0.666; stroke: #b8b; }
       svg .squares rect.puzzle { fill: #ddd; }
       svg .squares rect { fill: white; }
-      .root.puzzle svg .squares rect:not(.puzzle):hover { fill: yellow; }
-      .root.puzzle svg .squares rect:not(.puzzle).selected { fill: orange; }
+      .root.puzzle svg .squares rect:not(.puzzle):hover { fill: hsl(50,100%,80%); }
+      .root.puzzle svg .squares rect:not(.puzzle).selected { fill: hsl(50,100%,50%); } /* based on #ffda00 from NYTimes */
       .root.puzzle svg .squares rect:not(.puzzle), .root.puzzle svg .numbers text:not(.puzzle) { cursor: pointer; }
 
       .root:not(.edges) svg .edges line:not(.base) { visibility: hidden; }
