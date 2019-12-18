@@ -429,9 +429,9 @@ class SudokuGUI
     # * @user consists of @puzzle plus the user-input clues
     # However, @sudoku can be a partial solution in case of designer.
     @inPath = {}
-    for i in [1...@path.length]
-      @inPath[[@path[i],@path[i-1]]] = true
-      @inPath[[@path[i-1],@path[i]]] = true
+    for i in [0...@path.length]
+      @inPath[[@path[i], @path[(i+1) % @path.length]]] = true
+      @inPath[[@path[(i+1) % @path.length], @path[i]]] = true
     @user ?= @puzzle.clone()
     @squaresGroup = @svg.group()
     .addClass 'squares'
