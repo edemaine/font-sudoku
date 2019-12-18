@@ -31,6 +31,7 @@
       .root.path svg .edges line.base { stroke-width: 0.666; stroke: #b8b; }
       svg .squares rect.puzzle { fill: #ddd; }
       svg .squares rect { fill: white; }
+      .root.hints.puzzle svg .squares rect.hint { fill: hsl(140,70%,85%); }
       .root.puzzle svg .squares rect:not(.puzzle):hover { fill: hsl(50,100%,80%); }
       .root.puzzle svg .squares rect:not(.puzzle).selected { fill: hsl(50,100%,50%); } /* based on #ffda00 from NYTimes */
       .root.puzzle svg .squares rect:not(.puzzle), .root.puzzle svg .numbers text:not(.puzzle) { cursor: pointer; }
@@ -176,14 +177,17 @@ input[type=range]:focus::-ms-fill-upper {
           <TEXTAREA NAME="text" ID="text" ROWS=4 COLS=40>text</TEXTAREA>
         </TD>
         <TD>
-          <INPUT TYPE="radio" CHECKED NAME="mode" VALUE="solved" ID="solvedMode"> <LABEL FOR="solvedMode">Solved</LABEL>
+          <INPUT TYPE="radio" CHECKED NAME="mode" VALUE="solved" ID="solvedMode"><LABEL FOR="solvedMode">Solved</LABEL>
           <BR>
-          <INPUT TYPE="radio" NAME="mode" VALUE="puzzle" ID="puzzleMode"> <LABEL FOR="puzzleMode">Puzzle</LABEL>
+          <INPUT TYPE="radio" NAME="mode" VALUE="puzzle" ID="puzzleMode"><LABEL FOR="puzzleMode">Puzzle</LABEL>
         </TD>
         <TD>
-          <INPUT TYPE="checkbox" CHECKED ID="edges"> <LABEL FOR="edges">Consecutive edges</LABEL>
+          <INPUT TYPE="checkbox" CHECKED ID="edges"><LABEL FOR="edges">Consecutive edges</LABEL>
           <BR>
-          <INPUT TYPE="checkbox" CHECKED ID="path"> <LABEL FOR="path">Longest path</LABEL>
+          <INPUT TYPE="checkbox" CHECKED ID="path"><LABEL FOR="path">Longest path</LABEL>
+        </TD>
+        <TD>
+          <INPUT TYPE="checkbox" ID="hints"><LABEL FOR="hints">Hints</LABEL>
         </TD>
     </TABLE>
 

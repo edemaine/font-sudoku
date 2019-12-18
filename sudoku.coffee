@@ -103,6 +103,38 @@ class Sudoku
               seen[v] = [i, j]
     bad
 
+  available: (i, j) ->
+    # Returns list of values available for use for empty cell (i, j)
+    used = {}
+    # row constraint
+    for jj in [0...@boardSize]
+      used[@cell[i][jj]] = true
+    # column constraint
+    for ii in [0...@boardSize]
+      used[@cell[ii][j]] = true
+    # 3x3 subgrid constraint
+    sub_i = (i // @subSize) * @subSize
+    sub_j = (j // @subSize) * @subSize
+    for ii in [sub_i ... sub_i + @subSize]
+      for jj in [sub_j ... sub_j + @subSize]
+        used[@cell[ii][jj]] = true
+    # flip used vs. unused
+    for v in [1..9]
+      continue if used[v]
+      v
+
+  hints: ->
+    # Returns list of coordinates of blank squares with unique fill-in
+    hints = []
+    for i in [0...@boardSize]
+      for j in [0...@boardSize]
+        # Consider all blank cells
+        if @cell[i][j] == 0
+          available = @available i, j
+          if available.length == 1
+            hints.push [i, j]
+    hints
+
   fillImplied: ->
     implied = []
     anotherRound = true
@@ -115,24 +147,7 @@ class Sudoku
           for j in [0...@boardSize]
             # Consider all blank cells
             if @cell[i][j] == 0
-              used = {}
-              # row constraint
-              for jj in [0...@boardSize]
-                used[@cell[i][jj]] = true
-              # column constraint
-              for ii in [0...@boardSize]
-                used[@cell[ii][j]] = true
-              # 3x3 subgrid constraint
-              sub_i = (i // @subSize) * @subSize
-              sub_j = (j // @subSize) * @subSize
-              for ii in [sub_i ... sub_i + @subSize]
-                for jj in [sub_j ... sub_j + @subSize]
-                  used[@cell[ii][jj]] = true
-              # check for zero or unique unused value
-              unused =
-                for v in [1..9]
-                  continue if used[v]
-                  v
+              unused = @available i, j
               if unused.length == 0
                 dead = true
                 break
@@ -417,6 +432,7 @@ class SudokuGUI
     .addClass 'numbers'
     @drawGrid()
     @drawNumbers()
+    @updateUser()
 
   coord: (i, line = false) ->
     ci = i + i // @sudoku.subSize * (majorWidth - minorWidth)
@@ -482,17 +498,24 @@ class SudokuGUI
           l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i][j-1]
           l.addClass 'puzzle' if @puzzle?.cell[i][j] and @puzzle?.cell[i][j-1]
 
-  updateValid: ->
+  updateUser: ->
+    # Detect invalid squares
     for element in @svg.find '.invalid'
       element.removeClass 'invalid'
     for bad in @user.invalidCells()
       @puzzleNumbers[bad].addClass 'invalid'
 
+    # Detect hints (uniquely fillable squares)
+    for element in @svg.find '.hint'
+      element.removeClass 'hint'
+    for hint in @user.hints()
+      @squares[hint].addClass 'hint'
+
   set: ([i, j], value) ->
     #console.log 'setting', i, j, value
     @user.cell[i][j] = value
     @puzzleNumbers[[i,j]].text "#{@user.cell[i][j] or ''}"
-    @updateValid()
+    @updateUser()
 
   select: (i, j) ->
     # Selects cell (i,j) in this Sudoku GUI.  Selection needs to be
@@ -633,7 +656,8 @@ designGui = ->
 setClass = (id, state) ->
   document.getElementById id
   .setAttribute 'class',
-    (checkbox for checkbox in ['edges', 'path'] when state[checkbox])
+    (checkbox for checkbox in ['edges', 'path', 'hints'] \
+              when state[checkbox])
     .concat [state.mode, 'root']
     .join ' '
 
