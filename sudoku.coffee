@@ -394,10 +394,6 @@ exports = {Sudoku}
 
 ## GENERIC GUI
 
-# Use CSS to specify fonts
-SVG?.defaults.attrs['font-family'] = null
-SVG?.defaults.attrs['font-size'] = null
-
 selected = null
 
 class SudokuGUI
@@ -457,7 +453,7 @@ class SudokuGUI
         t = @numbersGroup.text "#{number}"
         #.move cj+0.5, ci+0.15
         .attr 'x', cj+0.5
-        .attr 'y', ci+0.7
+        .attr 'y', ci-0.05
         @squares[[i,j]] = square = @squaresGroup.rect 1, 1
         .move cj, ci
         if @puzzle?.cell[i][j] != 0
@@ -467,7 +463,7 @@ class SudokuGUI
           t.addClass 'solution'
           @userNumbers[[i,j]] = @numbersGroup.text "#{@user.cell[i][j] or ''}"
           .attr 'x', cj+0.5
-          .attr 'y', ci+0.7
+          .attr 'y', ci-0.05
           .addClass 'user'
           do (i, j) =>
             square.click click = => @select i, j
@@ -555,8 +551,8 @@ resize = (id) ->
 ## DESIGNER GUI
 
 designGui = ->
-  designSVG = SVG 'design'
-  resultSVG = SVG 'result'
+  designSVG = SVG().addTo '#design'
+  resultSVG = SVG().addTo '#result'
   sudoku = new Sudoku 3
   gui = new SudokuGUI designSVG, sudoku
 
@@ -648,7 +644,7 @@ updateText = (changed) ->
       if char of window.fontGen
         letter = window.fontGen[char]
         which = Math.floor letter.gen.length * Math.random()
-        svg = SVG outputWord
+        svg = SVG().addTo outputWord
         box = new Box svg, (new Sudoku letter.gen[which]),
           (new Sudoku letter.base), (new Sudoku letter.puzzle[which])
         charBoxes[char] ?= []
