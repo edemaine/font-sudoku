@@ -690,7 +690,7 @@ designGui = ->
 setClass = (id, state) ->
   document.getElementById id
   .setAttribute 'class',
-    (checkbox for checkbox in ['edges', 'path', 'hints'] \
+    (checkbox for checkbox in ['edges', 'path', 'mistakes', 'hints'] \
               when state[checkbox])
     .concat [state.mode, 'root']
     .join ' '

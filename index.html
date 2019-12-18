@@ -28,7 +28,7 @@
 
       svg .numbers text { text-anchor: middle; font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 0.6px; cursor: default; }
       /* bolder puzzle numbers: svg .numbers text.puzzle { font-weight: 700; }*/
-      .root.puzzle svg .numbers text.invalid { fill: hsl(0,100%,40%); stroke: hsl(0,100%,60%); stroke-width: 0.02; } /* cf. NYTimes #ff4b56 */
+      .root.puzzle.mistakes svg .numbers text.invalid { fill: hsl(0,100%,40%); stroke: hsl(0,100%,60%); stroke-width: 0.02; } /* cf. NYTimes #ff4b56 */
 
       svg .edges line { stroke-width: 0.333; stroke: #cac; stroke-linecap: round; }
       .root.path:not(.puzzle) svg .edges line.base,
@@ -198,6 +198,8 @@ input[type=range]:focus::-ms-fill-upper {
           <INPUT TYPE="checkbox" CHECKED ID="edges"><LABEL FOR="edges">Consecutive edges</LABEL>
           <BR>
           <INPUT TYPE="checkbox" CHECKED ID="path"><LABEL FOR="path">Longest path</LABEL>
+          <BR>
+          <INPUT TYPE="checkbox" CHECKED ID="mistakes"><LABEL FOR="mistakes">Mistakes</LABEL>
           <BR>
           <INPUT TYPE="checkbox" ID="hints"><LABEL FOR="hints">Hints</LABEL>
         </TD>
