@@ -215,6 +215,109 @@ input[type=range]:focus::-ms-fill-upper {
     <HR>
 
     <P>
+    <B><a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a></B>
+    or Number Place is among the most famous pencil-and-paper puzzles,
+    <a href="https://trends.google.com/trends/explore?date=all&q=%2Fm%2F04x1d_,%2Fm%2F0j4mv">rising in popularity in 2005</a>
+    to rival even crossword puzzles,
+    with <a href="https://www.nytimes.com/puzzles/sudoku/">daily puzzles in the New York Times</a>.
+    Its standard form consists of a 9&nbsp;&times;&nbsp;9 grid
+    decomposed into 3&nbsp;&times;&nbsp;3 subgrids that are each
+    3&nbsp;&times;&nbsp;3.  A puzzle has some cells pre-filled with
+    numbers between 1 and 9; the goal is to fill in the remaining cells
+    such that every row, column, and 3&nbsp;&times;&nbsp;3 subgrid
+    has every number between 1 and 9 (each exactly once).
+
+    <P>
+    <B>Fonts.</B>
+    In this typeface, each letter is represented by a standard Sudoku
+    puzzle whose unique solution &ldquo;draws the letter&rdquo; in the
+    following sense: if you connect together edge-adjacent squares having
+    <b>consecutive numbers</b> (1 to 2, 2 to 3, &hellip;, 8 to 9), then the
+    <b>longest path</b> through these connections draws the letter shape.
+    Consecutive numbers are easy for the puzzle solver to keep track of,
+    and somewhat controllable by the puzzle designer, but it also seems
+    impossible to avoid spurious consecutive-number connections;
+    the longest path allows us to clean out these spurious connections.
+    (<a href="https://archive.bridgesmathart.org/2011/bridges2011-187.pdf">Inglis and Kaplan</a> considered other approaches to designing Sudoku puzzles whose solution generate images.)
+
+    <P>
+    In the <b>Solved</b> font, you can see the completely solved puzzle,
+    which is nice for visualizing the font.  But more fun is
+    the <b>Puzzle</b> font, where you just see enough numbers to uniquely
+    determine the solution, and you need to solve the puzzle to figure out
+    the hidden letter.  You can interactively solve the puzzle by clicking
+    on a square and either typing the number you want to fill (1 through 9
+    or 0/delete/backspace to erase),
+    or clicking on the desired action at the top of the screen.
+    You can also use arrow keys (or vi's hjkl) to move around squares.
+    For each letter, we have designed 81 (=&nbsp;9<sup>2</sup>) different
+    puzzles that solve to the same longest path, and they are chosen at
+    random, so even repeated letters in a message offer distinct puzzles
+    and no shortcuts for recognizing duplicates.  (If you want to change
+    the random selections made for all letters, click the <b>Randomize</b>
+    button.)
+    &bull;
+    If you make a mistake (duplicate numbers in the same
+    row/column/subgrid), their text will turn red (unless you turn off
+    <b>Mistakes</b> visualization).
+    &bull;
+    If you're stuck, you can turn on <b>Hints</b> visualization,
+    which will highlight squares (in green) that currently have only
+    one way to fill them in.  (This makes the puzzles quite easy.)
+    &bull;
+    You can also turn on or off <b>Consecutive edges</b>
+    (among the grid filled in so far) and the <b>Longest path</b> through
+    these edges (which, in puzzle mode, shows only when you solve the
+    entire puzzle).
+
+    <P>
+    <B>Related mathematics.</B>
+    Generalized to an
+    <i>n</i><sup>2</sup>&nbsp;&times;&nbsp;<i>n</i><sup>2</sup> grid
+    with <i>n</i>&nbsp;&times;&nbsp;<i>n</i> subgrids,
+    Sudoku is <b>NP-complete</b>, and even stronger,
+    <b><a href="http://www-imai.is.s.u-tokyo.ac.jp/~yato/data2/SIGAL87-2.pdf">ASP-complete</a></b>.
+    This result means that it is computationally intractable to determine
+    whether a puzzle has a solution, and furthermore, whether it has
+    another solution even if we are given one or more solutions.
+    (The latter question is important for puzzle design, to guarantee a
+     unique solution.)
+    Even once you solve the Sudoku puzzles,
+    <a href="https://en.wikipedia.org/wiki/Longest_path_problem">finding the longest path</a> is also NP-complete,
+    <a href="https://arxiv.org/abs/1706.10046">even in grids</a>.
+
+    <P>
+    Most real-world Sudoku puzzles (including those in this typeface)
+    are designed in such a way to guarantee unique solvability.
+    The general approach is to start with a solved puzzle, then repeatedly
+    remove clues that can be uniquely determined by the remaining clues,
+    using one or more techniques/strategies/rules
+    (<a href="https://www.sudokudragon.com/sudokustrategy.htm">see</a>
+    <a href="https://www.conceptispuzzles.com/index.aspx?uri=puzzle/sudoku/techniques">variation</a>
+    <a href="https://www.kristanix.com/sudokuepic/sudoku-solving-techniques.php">descriptions</a>).
+    In this typeface, we just use the simplest (depth-1) rule:
+    if a square can be filled in by only one number that does not
+    duplicate another number in the same row, column, or subgrid,
+    then fill it in.
+    
+    <P>
+    <B>Genesis.</B>
+    This typeface design started shortly after Erik taught
+    <a href="https://py.mit.edu/_static/fall19/lectures/lecture04/lecture4.zip">a lecture</a>
+    in MIT's Fundamentals of Programming class (<a href="https://py.mit.edu/fall19">6.009</a>)
+    and realized how easy it is to write a brute-force Sudoku solver.
+    We designed the longest paths by hand, and used a solver to randomly
+    fill in the remaining squares (going back to the hand-drawing board
+    if no completion was possible), and then randomly removing clues that
+    could be filled back in by the simplest no-duplicates rule described
+    above.
+    We also prioritized the solver to avoid adding any extra consecutive
+    edges off the intended longest, when possible.  In two letters
+    (N and Q), this extra goal is impossible, so we just constrained the
+    longest path to not change.
+    (These computations take a while, so we precomputed them.)
+
+    <P>
     Check out <A HREF="http://erikdemaine.org/fonts/">other mathematical and
     puzzle fonts</A>. &bull; Feedback or not working?
     <A HREF="mailto:edemaine+fonts@mit.edu">Email Erik</A>.
