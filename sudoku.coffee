@@ -421,13 +421,17 @@ exports = {Sudoku}
 selected = null
 
 class SudokuGUI
-  constructor: (@svg, @sudoku, @base, @puzzle, @user) ->
+  constructor: (@svg, @sudoku, @path, @puzzle, @user) ->
     # Intent:
-    # * @sudoku is the generated full solution compatible with @base;
-    # * @base is the clues that form the letter; and
+    # * @sudoku is the generated full solution compatible with @path;
+    # * @path is the longest path that forms the letter; and
     # * @puzzle is the generated puzzle with enough clues to be unique.
     # * @user consists of @puzzle plus the user-input clues
     # However, @sudoku can be a partial solution in case of designer.
+    @inPath = {}
+    for i in [1...@path.length]
+      @inPath[[@path[i],@path[i-1]]] = true
+      @inPath[[@path[i-1],@path[i]]] = true
     @user ?= @puzzle.clone()
     @squaresGroup = @svg.group()
     .addClass 'squares'
@@ -501,12 +505,12 @@ class SudokuGUI
         if i > 0 and @sudoku.cell[i-1][j] and
            1 == Math.abs number - @sudoku.cell[i-1][j]
           l = @edgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
-          l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i-1][j]
+          l.addClass 'path' if [i,j, i-1,j] of @inPath
           l.addClass 'puzzle' if @puzzle?.cell[i][j] and @puzzle?.cell[i-1][j]
         if j > 0 and @sudoku.cell[i][j-1] and
            1 == Math.abs number - @sudoku.cell[i][j-1]
           l = @edgesGroup.line cj+0.5, ci+0.5, cj-0.5, ci+0.5
-          l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i][j-1]
+          l.addClass 'path' if [i,j, i,j-1] of @inPath
           l.addClass 'puzzle' if @puzzle?.cell[i][j] and @puzzle?.cell[i][j-1]
 
   updateUser: ->
@@ -533,11 +537,11 @@ class SudokuGUI
         if i > 0 and @user.cell[i-1][j] and
            1 == Math.abs number - @user.cell[i-1][j]
           l = @userEdgesGroup.line cj+0.5, ci+0.5, cj+0.5, ci-0.5
-          l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i-1][j]
+          l.addClass 'path' if [i,j, i-1,j] of @inPath
         if j > 0 and @user.cell[i][j-1] and
            1 == Math.abs number - @user.cell[i][j-1]
           l = @userEdgesGroup.line cj+0.5, ci+0.5, cj-0.5, ci+0.5
-          l.addClass 'base' if @base?.cell[i][j] and @base?.cell[i][j-1]
+          l.addClass 'path' if [i,j, i,j-1] of @inPath
 
     # Check whether completely solved
     if invalid.length == 0 and @user.complete()
@@ -717,7 +721,7 @@ updateText = (changed) ->
         which = Math.floor letter.gen.length * Math.random()
         svg = SVG().addTo outputWord
         box = new Box svg, (new Sudoku letter.gen[which]),
-          (new Sudoku letter.base), (new Sudoku letter.puzzle[which])
+          letter.path, (new Sudoku letter.puzzle[which])
         charBoxes[char] ?= []
         charBoxes[char].push box
         box.linked = charBoxes[char]

@@ -9,9 +9,10 @@ if module? and module == require?.main
     if process.argv.length > 2
       continue unless letter in process.argv
     console.log "# #{letter}"
-    out.push "  '#{letter}': {",
-             "    base: #{JSON.stringify font[letter]},"
     sudoku = new Sudoku font[letter]
+    [longestPath] = sudoku.longestPaths()
+    out.push "  '#{letter}': {",
+             "    path: #{JSON.stringify longestPath},"
     count = 0
     solutions = (solution for solution from sudoku.generate(
       switch letter
