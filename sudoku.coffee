@@ -2,6 +2,17 @@
 minorWidth = 0.05
 majorWidth = 0.15
 
+animStepDelay =
+  0: 750
+  1: 75
+  2: 750
+  3: 2750
+  4: 4000
+animStepDuration =
+  1: 500
+  3: 2000
+  4: 2000
+
 class Sudoku
   constructor: (cells) ->
     # Pass in subSize (e.g. 3 for standard Sudoku) or an array of arrays
@@ -477,6 +488,7 @@ class SudokuGUI
     @squaresGroup.clear()
     @squares = {}
     @puzzleNumbers = {}
+    @solutionNumbers = {}
     for i in [0...@sudoku.boardSize]
       for j in [0...@sudoku.boardSize]
         number = @sudoku.cell[i][j]
@@ -492,9 +504,11 @@ class SudokuGUI
         if @puzzle?.cell[i][j] != 0
           #t.addClass 'puzzle'
           @puzzleNumbers[[i,j]] = t
+          #@solutionNumbers[[i,j]] = t
           square.addClass 'puzzle'
         else
           t.addClass 'solution'
+          @solutionNumbers[[i,j]] = t
           @puzzleNumbers[[i,j]] = @numbersGroup.text "#{@user.cell[i][j] or ''}"
           .attr 'x', cj+0.5
           .attr 'y', ci-0.05
@@ -572,6 +586,37 @@ class SudokuGUI
       j = (j + dj) %% @sudoku.boardSize
       break if @puzzle?.cell[i][j] == 0
     @select i, j
+
+  animInit: ->
+    @anim = @puzzle.clone()
+    for key, dom of @solutionNumbers
+      dom.opacity 0
+    @edgesGroup.opacity 0
+  animStep: ->
+    hints = @anim.hints()
+    return true unless hints.length
+    hint = hints[0]
+    [i, j] = hint
+    @anim.cell[i][j] = @sudoku.cell[i][j]
+    @solutionNumbers[hint].animate(animStepDuration[1]).opacity 1
+    false
+  animEdges: ->
+    @edgesGroup.find 'line.path'
+    .css 'stroke', '#cac'
+    .css 'stroke-width', 0.333
+    @edgesGroup.animate(animStepDuration[3]).opacity 1
+  animPath: ->
+    @edgesGroup.find 'line.path'
+    .animate animStepDuration[4]
+    .css 'stroke', '#b8b'
+    .css 'stroke-width', 0.666
+  animEnd: ->
+    for key, dom of @solutionNumbers
+      dom.opacity 1
+    @edgesGroup.opacity 1
+    @edgesGroup.find 'line.path'
+    .css 'stroke', null
+    .css 'stroke-width', null
 
 numberInput = ->
   window.addEventListener 'keyup', (e) ->
@@ -699,40 +744,78 @@ setClass = (id, state) ->
     .concat [state.mode, 'root']
     .join ' '
 
+animation = 0
+boxes = []
+
 updateText = (changed) ->
   state = @getState()
   Box = SudokuGUI
   setClass 'output', state
 
-  return unless changed.text
-  selected = null
-  charBoxes = {}
-  output = document.getElementById 'output'
-  output.innerHTML = '' ## clear previous children
-  for line in state.text.split '\n'
-    output.appendChild outputLine = document.createElement 'p'
-    outputLine.setAttribute 'class', 'line'
-    outputLine.appendChild outputWord = document.createElement 'span'
-    outputWord.setAttribute 'class', 'word'
-    for char, c in line
-      char = char.toUpperCase()
-      if char of window.fontGen
-        letter = window.fontGen[char]
-        which = Math.floor letter.gen.length * Math.random()
-        svg = SVG().addTo outputWord
-        box = new Box svg, (new Sudoku letter.gen[which]),
-          letter.path, (new Sudoku letter.puzzle[which])
-        charBoxes[char] ?= []
-        charBoxes[char].push box
-        box.linked = charBoxes[char]
-      else if char == ' '
-        #space = document.createElement 'span'
-        #space.setAttribute 'class', 'space'
-        #outputLine.appendChild space
-        outputLine.appendChild outputWord = document.createElement 'span'
-        outputWord.setAttribute 'class', 'word'
-      else
-        console.log "Unknown character '#{char}'"
+  if changed.text
+    selected = null
+    charBoxes = {}
+    output = document.getElementById 'output'
+    output.innerHTML = '' ## clear previous children
+    boxes = []
+    for line in state.text.split '\n'
+      output.appendChild outputLine = document.createElement 'p'
+      outputLine.setAttribute 'class', 'line'
+      outputLine.appendChild outputWord = document.createElement 'span'
+      outputWord.setAttribute 'class', 'word'
+      for char, c in line
+        char = char.toUpperCase()
+        if char of window.fontGen
+          letter = window.fontGen[char]
+          which = Math.floor letter.gen.length * Math.random()
+          svg = SVG().addTo outputWord
+          box = new Box svg, (new Sudoku letter.gen[which]),
+            letter.path, (new Sudoku letter.puzzle[which])
+          boxes.push box
+          charBoxes[char] ?= []
+          charBoxes[char].push box
+          box.linked = charBoxes[char]
+        else if char == ' '
+          #space = document.createElement 'span'
+          #space.setAttribute 'class', 'space'
+          #outputLine.appendChild space
+          outputLine.appendChild outputWord = document.createElement 'span'
+          outputWord.setAttribute 'class', 'word'
+        else
+          console.log "Unknown character '#{char}'"
+
+  animation++
+  if state.mode == 'anim'
+    thisAnimation = animation
+    stage = 0
+    step = =>
+      return unless thisAnimation == animation
+      delay = animStepDelay[stage] # before stage changes
+      switch stage
+        when 0  # clear and reset
+          box.animInit() for box in boxes
+          stage++
+        when 1  # fill in Sudoku puzzles in hint order
+          done = 0
+          for box in boxes
+            done += box.animStep()
+          stage++ if done == boxes.length
+        when 2  # pause
+          stage++
+          stage += 2 unless @getState().edges
+        when 3  # draw consecutive edges
+          box.animEdges() for box in boxes
+          stage++
+          stage++ unless @getState().path
+        when 4  # draw path
+          box.animPath() for box in boxes
+          stage++
+        when 5  # pause
+          stage = 0
+      setTimeout step, delay
+    step()
+  else
+    box.animEnd() for box in boxes
 
 sizeUpdate = ->
   size = document.getElementById('size').value
