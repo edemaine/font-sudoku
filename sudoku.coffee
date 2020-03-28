@@ -588,6 +588,7 @@ class SudokuGUI
     @select i, j
 
   animInit: ->
+    @animEnd()
     @anim = @puzzle.clone()
     for key, dom of @solutionNumbers
       dom.opacity 0
@@ -612,11 +613,14 @@ class SudokuGUI
     .css 'stroke-width', 0.666
   animEnd: ->
     for key, dom of @solutionNumbers
+      dom.timeline().finish()
       dom.opacity 1
+    @edgesGroup.timeline().finish()
     @edgesGroup.opacity 1
     @edgesGroup.find 'line.path'
-    .css 'stroke', null
-    .css 'stroke-width', null
+    .each (dom) ->
+      dom.timeline().finish()
+      dom.attr 'style', null
 
 numberInput = ->
   window.addEventListener 'keyup', (e) ->
