@@ -751,8 +751,15 @@ setClass = (id, state) ->
 animation = 0
 boxes = []
 
+updateLink = (state) ->
+  if (link = document.getElementById 'link') and
+     (href = link.getAttribute 'data-href')
+    href = href.replace /TEXT/, state.text
+    link.setAttribute 'href', href
+
 updateText = (changed) ->
   state = @getState()
+  updateLink state
   Box = SudokuGUI
   setClass 'output', state
 
@@ -839,13 +846,14 @@ fontGui = ->
   document.getElementById 'randomize'
   .addEventListener 'click', -> updateText.call furls, text: true # force
 
-  window.addEventListener 'resize', resize = ->
-    document.getElementById('size').max =
-      document.getElementById('size').scrollWidth - 30 - 2
-  resize()
-  for event in ['input', 'propertychange']
-    document.getElementById('size').addEventListener event, sizeUpdate
-  sizeUpdate()
+  if document.getElementById 'size'
+    window.addEventListener 'resize', size = ->
+      document.getElementById('size').max =
+        document.getElementById('size').scrollWidth - 30 - 2
+    size()
+    for event in ['input', 'propertychange']
+      document.getElementById('size').addEventListener event, sizeUpdate
+    sizeUpdate()
   numberInput()
 
 ## GUI MAIN
