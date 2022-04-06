@@ -439,10 +439,12 @@ class SudokuGUI
     # * @puzzle is the generated puzzle with enough clues to be unique.
     # * @user consists of @puzzle plus the user-input clues
     # However, @sudoku can be a partial solution in case of designer.
+    @path ?= []
     @inPath = {}
     for i in [0...@path.length]
       @inPath[[@path[i], @path[(i+1) % @path.length]]] = true
       @inPath[[@path[(i+1) % @path.length], @path[i]]] = true
+    @puzzle ?= @sudoku.clone()
     @user ?= @puzzle.clone()
     @squaresGroup = @svg.group()
     .addClass 'squares'
@@ -696,7 +698,7 @@ designGui = ->
         when 'longest'
           [result] = result.generate 'longest', 1
       if result?
-        new SudokuGUI resultSVG, result, sudoku
+        new SudokuGUI resultSVG, result, [], sudoku
       else
         resultSVG.text "no solution"
         resultSVG.viewbox {x: 0, y: -10, width: 80, height: 20}
