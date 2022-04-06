@@ -635,13 +635,13 @@ numberInput = ->
       selected.set selected.selected, num
     else
       switch e.key
-        when 'h', 'ArrowLeft'
+        when 'a', 'h', 'ArrowLeft'
           selected.selectMove 0, -1
-        when 'l', 'ArrowRight'
+        when 'd', 'l', 'ArrowRight'
           selected.selectMove 0, +1
-        when 'j', 'ArrowDown'
+        when 's', 'j', 'ArrowDown'
           selected.selectMove +1, 0
-        when 'k', 'ArrowUp'
+        when 'w', 'k', 'ArrowUp'
           selected.selectMove -1, 0
         else
           stop = false
