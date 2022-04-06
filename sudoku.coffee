@@ -853,6 +853,8 @@ fontGui = ->
 
   if document.getElementById 'size'
     window.addEventListener 'resize', size = ->
+      width = document.getElementById('size').scrollWidth
+      return unless width  # zero in hud=0 mode
       document.getElementById('size').max =
         document.getElementById('size').scrollWidth - 30 - 2
     size()

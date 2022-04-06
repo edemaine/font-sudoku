@@ -210,6 +210,10 @@ input[type=range]:focus::-ms-fill-upper {
           <INPUT TYPE="checkbox" ID="hints"><LABEL FOR="hints">Hints</LABEL>
           <BR>
           <INPUT ID="hud" TYPE="checkbox" CHECKED>
+          <SCRIPT>
+            if (/[?&]hud=0/.test(window.location.search)) // avoid blinking
+              document.documentElement.classList.add('hud-false');
+          </SCRIPT>
         </TD>
     </TABLE>
 
