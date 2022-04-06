@@ -683,8 +683,6 @@ designGui = ->
   .addInputs()
   .on 'stateChange', ->
     state = @getState()
-    setClass 'design', state
-    setClass 'result', state
     resultSVG.clear()
     result = sudoku.clone()
     try
@@ -705,6 +703,7 @@ designGui = ->
     catch e
       console.error e
   .syncState()
+  .syncClass()
 
   document.getElementById 'resolve'
   .addEventListener 'click', -> furls.trigger 'stateChange'
@@ -740,14 +739,6 @@ designGui = ->
 
 ## FONT GUI
 
-setClass = (id, state) ->
-  document.getElementById id
-  .setAttribute 'class',
-    (checkbox for checkbox in ['edges', 'path', 'mistakes', 'hints'] \
-              when state[checkbox])
-    .concat [state.mode, 'root']
-    .join ' '
-
 animation = 0
 boxes = []
 
@@ -761,7 +752,6 @@ updateText = (changed) ->
   state = @getState()
   updateLink state
   Box = SudokuGUI
-  setClass 'output', state
 
   if changed.text
     selected = null

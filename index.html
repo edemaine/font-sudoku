@@ -32,34 +32,34 @@
 
       svg .numbers text { text-anchor: middle; font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 0.6px; cursor: default; }
       /* bolder puzzle numbers: svg .numbers text.puzzle { font-weight: 700; }*/
-      .root.puzzle.mistakes svg .numbers text.invalid { fill: hsl(0,100%,40%); stroke: hsl(0,100%,60%); stroke-width: 0.02; } /* cf. NYTimes #ff4b56 */
+      :root.mode-puzzle.mistakes-true svg .numbers text.invalid { fill: hsl(0,100%,40%); stroke: hsl(0,100%,60%); stroke-width: 0.02; } /* cf. NYTimes #ff4b56 */
 
       svg .edges line { stroke-width: 0.333; stroke: #cac; stroke-linecap: round; }
-      .root.path:not(.puzzle) svg .edges line.path,
-      .root.path svg.solved .edges line.path { stroke-width: 0.666; stroke: #b8b; }
-      .root.puzzle .edges.solved { visibility: hidden; }
-      .root:not(.puzzle) .edges.user { visibility: hidden; }
+      :root.path-true:not(.puzzle) svg .edges line.path,
+      :root.path-true svg.solved .edges line.path { stroke-width: 0.666; stroke: #b8b; }
+      :root.mode-puzzle .edges.solved { visibility: hidden; }
+      :root:not(.mode-puzzle) .edges.user { visibility: hidden; }
 
       svg .squares rect.puzzle { fill: #ddd; }
       svg .squares rect { fill: white; }
-      .root.hints.puzzle svg .squares rect.hint { fill: hsl(140,70%,85%); }
-      .root.puzzle svg .squares rect:not(.puzzle):hover { fill: hsl(50,100%,80%); }
-      .root.puzzle svg .squares rect:not(.puzzle).selected { fill: hsl(50,100%,50%); } /* based on #ffda00 from NYTimes */
-      .root.puzzle svg .squares rect:not(.puzzle), .root.puzzle svg .numbers text:not(.puzzle) { cursor: pointer; }
+      :root.hints-true.mode-puzzle svg .squares rect.hint { fill: hsl(140,70%,85%); }
+      :root.mode-puzzle svg .squares rect:not(.puzzle):hover { fill: hsl(50,100%,80%); }
+      :root.mode-puzzle svg .squares rect:not(.puzzle).selected { fill: hsl(50,100%,50%); } /* based on #ffda00 from NYTimes */
+      :root.mode-puzzle svg .squares rect:not(.puzzle), :root.mode-puzzle svg .numbers text:not(.puzzle) { cursor: pointer; }
 
-      .root:not(.edges) svg .edges line:not(.base) { visibility: hidden; }
-      .root:not(.edges):not(.path) svg .edges line.base { visibility: hidden; }
-      .root.puzzle svg .numbers text.solution { visibility: hidden; }
-      .root:not(.puzzle) svg .numbers text.user { visibility: hidden; }
+      :root.edges-false svg .edges line:not(.base) { visibility: hidden; }
+      :root.edges-false.path-false svg .edges line.base { visibility: hidden; }
+      :root.mode-puzzle svg .numbers text.solution { visibility: hidden; }
+      :root:not(.mode-puzzle) svg .numbers text.user { visibility: hidden; }
 
       svg .target { fill: purple; }
       svg .target:hover { cursor: pointer; }
       svg { user-select: none; }
 
-      .root.puzzle svg.solved { outline: solid gold 3px; } /* gold = hsl(52,89%,55%) */
-      .root.puzzle svg.solved .grid line:not(.border) { stroke: hsl(52,30%,40%); }
-      .root.puzzle svg.solved .squares rect { fill: hsl(52,89%,98%); }
-      .root.puzzle svg.solved .squares rect.puzzle { fill: hsl(52,30%,87%); }
+      :root.mode-puzzle svg.solved { outline: solid gold 3px; } /* gold = hsl(52,89%,55%) */
+      :root.mode-puzzle svg.solved .grid line:not(.border) { stroke: hsl(52,30%,40%); }
+      :root.mode-puzzle svg.solved .squares rect { fill: hsl(52,89%,98%); }
+      :root.mode-puzzle svg.solved .squares rect.mode-puzzle { fill: hsl(52,30%,87%); }
 
       #numbers { position: fixed; top: 0; left: 0; right: 0; text-align: center; }
       #numbers div { display: inline-block; border: solid;
@@ -221,7 +221,7 @@ input[type=range]:focus::-ms-fill-upper {
 
     <P>
 
-    <DIV id="output" STYLE="width: 100%" CLASS="root">
+    <DIV id="output" STYLE="width: 100%">
     </DIV>
 
     <DIV STYLE="text-align: right" CLASS="noprint">
