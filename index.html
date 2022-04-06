@@ -19,6 +19,10 @@
 
       TD { vertical-align: top; }
 
+      #hud { display: none; }
+
+      .hud-false > body > *:not(#output) { display: none; }
+
       /* NYTimes uses #959595 for inner lines, nyt-franklin for font */
 
       /* These widths must match minorWidth and majorWidth in sudoku.coffee */
@@ -204,6 +208,8 @@ input[type=range]:focus::-ms-fill-upper {
           <INPUT TYPE="checkbox" CHECKED ID="mistakes"><LABEL FOR="mistakes">Mistakes</LABEL>
           <BR>
           <INPUT TYPE="checkbox" ID="hints"><LABEL FOR="hints">Hints</LABEL>
+          <BR>
+          <INPUT ID="hud" TYPE="checkbox" CHECKED>
         </TD>
     </TABLE>
 
@@ -212,6 +218,10 @@ input[type=range]:focus::-ms-fill-upper {
     <P>
 
     <DIV id="output" STYLE="width: 100%" CLASS="root">
+    </DIV>
+
+    <DIV STYLE="text-align: right" CLASS="noprint">
+      <BUTTON ID="nohud" TITLE="Use browser back button to restore interface.">Hide all but font rendering</BUTTON>
     </DIV>
 
     <HR>

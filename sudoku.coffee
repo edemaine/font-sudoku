@@ -842,6 +842,11 @@ fontGui = ->
   .addInputs()
   .on 'stateChange', updateText
   .syncState()
+  .syncClass()
+
+  document.getElementById 'nohud'
+  ?.addEventListener 'click', ->
+    furls.set 'hud', false
 
   document.getElementById 'randomize'
   .addEventListener 'click', -> updateText.call furls, text: true # force
