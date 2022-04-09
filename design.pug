@@ -1,0 +1,78 @@
+doctype html
+html
+  head
+    title Sudoku Designer
+    script(type="text/javascript", src="node_modules/@svgdotjs/svg.js/dist/svg.min.js")
+    script(type="text/javascript", src="node_modules/furls/furls.js")
+    script(type="text/javascript", src="font.js")
+    script(type="text/javascript", src="sudoku.js")
+    link(href="https://fonts.googleapis.com/css?family=Libre+Franklin:700&display=swap", rel="stylesheet")
+    style
+      :stylus
+        @media print
+          .noprint
+            display: none
+      include:stylus sudoku.styl
+    //#include virtual="../../analytics.html"
+  body
+    table.w-100
+      tr
+        td.text-left.align-middle
+          h1
+            a(href="design.html") Sudoku Designer
+        td.text-right.align-middle
+          h2 by <a href="https://erikdemaine.org/">Erik Demaine</a> and <a href="http://martindemaine.org">Martin Demaine</a>, 2019
+
+    table.w-100.noprint
+      tr
+        td
+          select#board
+            option(value="4") 4&nbsp;&times;&nbsp;4
+            option(value="9", selected) 9&nbsp;&times;&nbsp;9
+            option(value="16") 16&nbsp;&times;&nbsp;16
+            option(value="25") 25&nbsp;&times;&nbsp;25
+          br
+          | Load font letter:
+          span#loadFont
+          //-
+            br
+            button#clear Clear
+        td
+          input#edges(type="checkbox", checked)
+          label(for="edges") Consecutive edges
+          br
+          input#path(type="checkbox", checked)
+          label(for="path") Longest path
+        td
+          input#solveAny(type="radio", checked, name="solve", value="any")
+          label(for="solveAny") Any solution
+          br
+          input#solveLongest(type="radio", name="solve" value="longest")
+          label(for="solveLongest") Longest-path solution (anything with correct longest path)
+          br
+          input#solvePermissive(type="radio", name="solve", value="permissive")
+          label(for="solvePermissive") Permissive solution (single attached edges)
+          br
+          input#solveStrict(type="radio", name="solve", value="strict")
+          label(for="solveStrict") Strict solution (no extra attached edges)
+          br
+          button#resolve Solve
+        //-
+          td
+            button#downloadSVG Download SVG
+            a#svglink(style="display: none")
+
+    p
+
+    table#gui.w-100
+      tr
+        td#design.root.w-50
+        td#result.root.w-50
+
+    hr
+
+    p.noprint.
+      Check out <a href="http://erikdemaine.org/fonts/">other mathematical and
+      puzzle fonts</a>. &bull; Feedback or not working?
+      <a href="mailto:edemaine+fonts@mit.edu">Email Erik</a>. &bull;
+      <a href="https://github.com/edemaine/font-sudoku">Source code on GitHub</a>.

@@ -1,0 +1,112 @@
+@media print
+  .noprint
+    display: none
+
+.w-50
+  width: 50%
+.w-100
+  width: 100%
+.text-left
+  text-align: left
+.text-right
+  text-align: right
+.align-middle
+  vertical-align: middle
+
+// NYTimes uses #959595 for inner lines, nyt-franklin for font
+
+svg
+  user-select: none
+
+  // These widths must match minorWidth and majorWidth in sudoku.coffee
+  .grid line
+    stroke-width: 0.05
+    stroke: #666
+    stroke-linecap: square
+    &.major
+      stroke-width: 0.15
+    &.border
+      stroke-width: 0.15
+      stroke: black
+
+  .numbers text
+    text-anchor: middle
+    font-family: 'Libre Franklin', sans-serif
+    font-weight: 700
+    font-size: 0.6px
+    cursor: default
+    // bolder puzzle numbers: &.puzzle { font-weight: 700; }
+    /:root.mode-puzzle.mistakes-true &.invalid
+      fill: hsl(0,100%,40%) // cf. NYTimes #ff4b56
+      stroke: hsl(0,100%,60%)
+      stroke-width: 0.02
+    /:root.mode-puzzle &:not(.puzzle)
+      cursor: pointer
+    /:root.mode-puzzle &.solution,
+    /:root:not(.mode-puzzle) &.user
+      visibility: hidden
+
+  .edges
+    line
+      stroke-width: 0.333
+      stroke: #cac
+      stroke-linecap: round
+      /:root.path-true:not(.mode-puzzle) &.path,
+      /:root.path-true svg.solved .edges line.path
+        stroke-width: 0.666
+        stroke: #b8b
+      /:root.edges-false &:not(.base),
+      /:root.edges-false.path-false &.base
+        visibility: hidden
+    /:root.mode-puzzle &.solved,
+    /:root:not(.mode-puzzle) &.user
+      visibility: hidden
+
+  .squares rect
+    fill: white
+    &.puzzle
+      fill: #ddd
+    /:root.hints-true.mode-puzzle &.hint
+      fill: hsl(140,70%,85%)
+    /:root.mode-puzzle &:not(.puzzle)
+      cursor: pointer
+      &:hover
+        fill: hsl(50,100%,80%)
+      &.selected
+        fill: hsl(50,100%,50%) // based on #ffda00 from NYTimes
+
+  .target
+    fill: purple
+    &:hover
+      cursor: pointer
+
+  /:root.mode-puzzle &.solved
+    outline: solid gold 3px // gold = hsl(52,89%,55%)
+    .grid line:not(.border)
+      stroke: hsl(52,30%,40%)
+    .squares rect
+      fill: hsl(52,89%,98%)
+    .squares rect.mode-puzzle
+      fill: hsl(52,30%,87%)
+
+#numbers
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  text-align: center
+
+  div
+    display: inline-block
+    border: solid
+    min-width: 25px
+    min-height: 25px
+    padding: 2px
+    text-align: center
+    font-family: 'Libre Franklin', sans-serif
+    font-weight: 700
+    font-size: 20px
+    background: #ddd
+    cursor: pointer
+    &:hover
+      background: hsl(50,100%,80%)

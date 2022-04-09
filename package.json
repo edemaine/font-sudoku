@@ -1,14 +1,27 @@
 {
-  "name": "sudoku",
+  "name": "sudoku-font",
   "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Erik Demaine",
-  "license": "MIT",
+  "description": "Sudoku font",
   "dependencies": {
     "@svgdotjs/svg.js": "^3.0.16",
-    "furls": "^0.7.0"
-  }
+    "font-webapp": "^0.3.0",
+    "furls": "^0.8.1"
+  },
+  "devDependencies": {
+    "coffeescript": "^2.5.1",
+    "gulp": "^4.0.2",
+    "gulp-chmod": "^3.0.0",
+    "gulp-coffee": "^3.0.3",
+    "gulp-pug": "^5.0.0",
+    "jstransformer-stylus": "^1.5.0"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "pug": "gulp pug",
+    "coffee": "gulp coffee",
+    "font": "gulp font",
+    "watch": "gulp watch"
+  },
+  "author": "Erik Demaine",
+  "license": "MIT"
 }

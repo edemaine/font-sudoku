@@ -1,4 +1,4 @@
-# These widths must match the widths in design.html
+# These widths must match the widths in sudoku.styl
 minorWidth = 0.05
 majorWidth = 0.15
 
@@ -497,10 +497,10 @@ class SudokuGUI
         continue unless number
         ci = @coord i
         cj = @coord j
-        t = @numbersGroup.text "#{number}"
+        t = @numbersGroup.plain "#{number}"
         #.move cj+0.5, ci+0.15
         .attr 'x', cj+0.5
-        .attr 'y', ci-0.05
+        .attr 'y', ci+0.75
         @squares[[i,j]] = square = @squaresGroup.rect 1, 1
         .move cj, ci
         if @puzzle?.cell[i][j] != 0
@@ -675,7 +675,7 @@ resize = (id) ->
 
 ## DESIGNER GUI
 
-designGui = ->
+designGUI = ->
   designSVG = SVG().addTo '#design'
   resultSVG = SVG().addTo '#result'
   sudoku = new Sudoku 3
@@ -741,118 +741,72 @@ designGui = ->
 
 ## FONT GUI
 
-animation = 0
-boxes = []
+fontGUI = ->
+  animation = 0
+  animBoxes = null
 
-updateLink = (state) ->
-  if (link = document.getElementById 'link') and
-     (href = link.getAttribute 'data-href')
-    href = href.replace /TEXT/, state.text
-    link.setAttribute 'href', href
+  app = new FontWebappHTML
+    root: '#output'
+    sizeSlider: '#size'
+    sizeName: 'size'
+    charWidth: 250
+    charPadding: 12.5
+    charKern: 0
+    lineKern: 20
+    spaceWidth: 100
+    shouldRender: (changed) ->
+      changed.text
+    renderChar: (char, state, parent) ->
+      char = char.toUpperCase()
+      letter = window.fontGen[char]
+      return unless letter?
+      which = Math.floor letter.gen.length * Math.random()
+      svg = SVG().addTo parent
+      box = new SudokuGUI svg, (new Sudoku letter.gen[which]),
+        letter.path, (new Sudoku letter.puzzle[which])
+    linkIdenticalChars: (glyphs) ->
+      glyph.linked = glyphs for glyph in glyphs
+    afterMaybeRender: (state, changed, rendered) ->
+      return unless rendered or changed.mode or changed.edges or
+                                (changed.path and state.edges)
+      animation++
+      if state.mode == 'anim'
+        thisAnimation = animation
+        stage = 0
+        step = =>
+          return unless thisAnimation == animation
+          delay = animStepDelay[stage] # before stage changes
+          switch stage
+            when 0  # clear and reset
+              box.animInit() for box in @renderedGlyphs
+              stage++
+            when 1  # fill in Sudoku puzzles in hint order
+              done = 0
+              for box in @renderedGlyphs
+                done += box.animStep()
+              stage++ if done == @renderedGlyphs.length
+            when 2  # pause
+              stage++
+              stage += 2 unless state.edges
+            when 3  # draw consecutive edges
+              box.animEdges() for box in @renderedGlyphs
+              stage++
+              stage++ unless state.path
+            when 4  # draw path
+              box.animPath() for box in @renderedGlyphs
+              stage++
+            when 5  # pause
+              stage = 0
+          setTimeout step, delay
+        step()
+      else
+        box.animEnd() for box in @renderedGlyphs
 
-updateText = (changed) ->
-  state = @getState()
-  updateLink state
-  Box = SudokuGUI
+  document.getElementById('nohud')?.addEventListener 'click', ->
+    app.furls.set 'hud', false
+  document.getElementById('randomize').addEventListener 'click', ->
+    app.render()
 
-  if changed.text
-    selected = null
-    charBoxes = {}
-    output = document.getElementById 'output'
-    output.innerHTML = '' ## clear previous children
-    boxes = []
-    for line in state.text.split '\n'
-      output.appendChild outputLine = document.createElement 'p'
-      outputLine.setAttribute 'class', 'line'
-      outputLine.appendChild outputWord = document.createElement 'span'
-      outputWord.setAttribute 'class', 'word'
-      for char, c in line
-        char = char.toUpperCase()
-        if char of window.fontGen
-          letter = window.fontGen[char]
-          which = Math.floor letter.gen.length * Math.random()
-          svg = SVG().addTo outputWord
-          box = new Box svg, (new Sudoku letter.gen[which]),
-            letter.path, (new Sudoku letter.puzzle[which])
-          boxes.push box
-          charBoxes[char] ?= []
-          charBoxes[char].push box
-          box.linked = charBoxes[char]
-        else if char == ' '
-          #space = document.createElement 'span'
-          #space.setAttribute 'class', 'space'
-          #outputLine.appendChild space
-          outputLine.appendChild outputWord = document.createElement 'span'
-          outputWord.setAttribute 'class', 'word'
-        else
-          console.log "Unknown character '#{char}'"
-
-  animation++
-  if state.mode == 'anim'
-    thisAnimation = animation
-    stage = 0
-    step = =>
-      return unless thisAnimation == animation
-      delay = animStepDelay[stage] # before stage changes
-      switch stage
-        when 0  # clear and reset
-          box.animInit() for box in boxes
-          stage++
-        when 1  # fill in Sudoku puzzles in hint order
-          done = 0
-          for box in boxes
-            done += box.animStep()
-          stage++ if done == boxes.length
-        when 2  # pause
-          stage++
-          stage += 2 unless @getState().edges
-        when 3  # draw consecutive edges
-          box.animEdges() for box in boxes
-          stage++
-          stage++ unless @getState().path
-        when 4  # draw path
-          box.animPath() for box in boxes
-          stage++
-        when 5  # pause
-          stage = 0
-      setTimeout step, delay
-    step()
-  else
-    box.animEnd() for box in boxes
-
-sizeUpdate = ->
-  size = document.getElementById('size').value
-  while document.getElementById('svgSize').sheet.cssRules.length > 0
-    document.getElementById('svgSize').sheet.deleteRule 0
-  document.getElementById('svgSize').sheet.insertRule(
-    "svg { width: #{0.9*size}px; margin: #{size*0.05}px; }", 0)
-  document.getElementById('svgSize').sheet.insertRule(
-    ".word + .word { margin-left: #{0.4*size}px; }", 1)
-
-fontGui = ->
-  furls = new Furls()
-  .addInputs()
-  .on 'stateChange', updateText
-  .syncState()
-  .syncClass()
-
-  document.getElementById 'nohud'
-  ?.addEventListener 'click', ->
-    furls.set 'hud', false
-
-  document.getElementById 'randomize'
-  .addEventListener 'click', -> updateText.call furls, text: true # force
-
-  if document.getElementById 'size'
-    window.addEventListener 'resize', size = ->
-      width = document.getElementById('size').scrollWidth
-      return unless width  # zero in hud=0 mode
-      document.getElementById('size').max =
-        document.getElementById('size').scrollWidth - 30 - 2
-    size()
-    for event in ['input', 'propertychange']
-      document.getElementById('size').addEventListener event, sizeUpdate
-    sizeUpdate()
   numberInput()
 
 ## GUI MAIN
@@ -861,6 +815,6 @@ window?.onload = ->
   #if window.showMe?
   #  showMe()
   if document.getElementById 'text'
-    fontGui()
+    fontGUI()
   else if document.getElementById 'design'
-    designGui()
+    designGUI()
